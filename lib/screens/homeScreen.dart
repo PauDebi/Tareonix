@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taskly/screens/login_page.dart';
+import 'package:taskly/screens/entryDialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     barrierDismissible: false, // Bloquea el cierre al tocar fuera
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) {
-      return const LoginPage(); // Usa el LoginPage modificado
+      return EntryDialog(); // Usa el LoginPage modificado
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       body: Center(
         child: Text(
-          'Trello competency',
+          'Trello\'s competency',
           style: TextStyle(color: Colors.black, fontSize: 24),
         ),
       ),
