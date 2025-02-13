@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/screens/homeScreen.dart';
 
 void main() {
@@ -10,9 +12,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return BlocProvider(
+      create: (_) => AuthCubit(), // Aquí inicializamos el cubit
+      child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: HomeScreen(userName: "N"),
+      ),
     );
   }
 }
