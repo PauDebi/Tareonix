@@ -24,3 +24,23 @@ class AuthLoggedIn extends AuthState {
 }
 
 class AuthLoggedOut extends AuthState {}
+
+/// Estado que indica que se requiere verificar el email antes de iniciar sesión.
+class AuthEmailVerificationRequired extends AuthState {
+  final String message;
+
+  AuthEmailVerificationRequired({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Estado para manejar errores en el registro o login.
+class AuthError extends AuthState {
+  final String errorMessage;
+
+  AuthError({required this.errorMessage});
+
+  @override
+  List<Object?> get props => [errorMessage];
+}

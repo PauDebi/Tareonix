@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/provider/auth_cubit.dart';
+import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/screens/homeScreen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
+        BlocProvider<ProjectCubit>(create: (_) => ProjectCubit()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AuthCubit(), // Aquí inicializamos el cubit
-      child: MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(userName: "N"),
-      ),
+      title: 'Taskly App',
+      home: HomeScreen(userName: 'Usuario'),
     );
   }
 }

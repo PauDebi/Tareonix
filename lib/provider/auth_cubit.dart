@@ -7,14 +7,12 @@ import 'package:taskly/models/User.dart';
 
 part 'auth_state.dart';
 
-
-
 class AuthCubit extends Cubit<AuthState> {
-
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   AuthCubit() : super(AuthInitial());
-    void showSignUp() {
+
+  void showSignUp() {
     emit(AuthShowSignUp());
   }
 
@@ -26,7 +24,9 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthShowGoogleSignIn());
   }
 
-  void signUp(String name, String email, String password) async {
+  /// Registra al usuario y, en lugar de iniciar sesión automáticamente,
+  /// emite un estado indicando que se debe verificar el email.
+  Future<void> signUp(String name, String email, String password) async {
     final url = Uri.parse('http://worldgames.es/api/auth/register');
     
     final response = await http.post(
@@ -39,55 +39,65 @@ class AuthCubit extends Cubit<AuthState> {
       }),
     );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 201) {
+      // El registro fue exitoso, pero se requiere verificación de email.
       final responseData = jsonDecode(response.body);
-      final String token = responseData['token']; // Asegúrate de que el JSON devuelva "token"
-      final user = User.fromJson(responseData['user']);
-
-      // Guardar el token de forma segura
-      await secureStorage.write(key: "token", value: token);
-      await saveUser(user);
-
-      emit(AuthLoggedIn(userName: responseData['name']));
+      String message = responseData['message'] ??
+          'Registro exitoso. Revisa tu email para verificar la cuenta.';
+      emit(AuthEmailVerificationRequired(message: message));
     } else {
-      print("Error: ${response.body}");
+      // Ocurrió un error en el registro.
+      final responseData = jsonDecode(response.body);
+      String errorMessage =
+          responseData['error'] ?? 'Error desconocido en el registro';
+      emit(AuthError(errorMessage: errorMessage));
     }
   }
 
-  void logIn(String email, String password) {
+  /// Realiza el login. Si el usuario no ha verificado el email,
+  /// se emite un estado indicando que debe verificarlo.
+  Future<void> logIn(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      emit(AuthShowLogIn()); // No cambia a `AuthLoggedIn` si los datos son inválidos
+      emit(AuthShowLogIn());
       return;
     }
 
     final url = Uri.parse('http://worldgames.es/api/auth/login');
-    http.post(
+    final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": email,
         "password": password,
       }),
-    ).then((response) {
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-        final String token = responseData['token']; // Asegúrate de que el JSON devuelva "token"
-        final user = User.fromJson(responseData['user']);
+    );
 
-        // Guardar el token de forma segura
-        secureStorage.write(key: "token", value: token);
-        saveUser(user);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final String token = responseData['token'];
+      final user = User.fromJson(responseData['user']);
 
-        emit(AuthLoggedIn(userName: user.name));
+      // Guardar el token y los datos del usuario de forma segura.
+      await secureStorage.write(key: "token", value: token);
+      await saveUser(user);
+
+      emit(AuthLoggedIn(userName: user.name, userImageUrl: user.imageUrl));
+    } else {
+      final responseData = jsonDecode(response.body);
+      String errorMessage =
+          responseData['error'] ?? 'Error desconocido en el login';
+      // Si el mensaje de error indica que el email no ha sido verificado.
+      if (errorMessage.toLowerCase().contains('verify')) {
+        emit(AuthEmailVerificationRequired(
+            message:
+                'Por favor, verifica tu email antes de iniciar sesión.'));
       } else {
-        print("Error: ${response.body}");
+        emit(AuthError(errorMessage: errorMessage));
       }
-    });
-
-    emit(AuthLoggedIn(userName: email.split('@').first)); // Simulación usando el nombre del email
+    }
   }
 
-  Future<void> logout() async{
+  Future<void> logout() async {
     await secureStorage.delete(key: "token");
     await deleteUser();
     emit(AuthLoggedOut());

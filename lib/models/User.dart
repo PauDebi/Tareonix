@@ -3,12 +3,14 @@ class User {
   final DateTime createdAt;
   final String name;
   final String email;
+  final String? imageUrl;
 
   User({
     required this.id,
     required this.createdAt,
     required this.name,
     required this.email,
+    this.imageUrl
   });
 
   // Convertir JSON a un objeto User
@@ -18,6 +20,7 @@ class User {
       createdAt: DateTime.parse(json['createdAt']),
       name: json['name'],
       email: json['email'],
+      imageUrl: json['imageUrl']
     );
   }
 
@@ -28,6 +31,7 @@ class User {
       'createdAt': createdAt.toIso8601String(),
       'name': name,
       'email': email,
+      'imageUrl': imageUrl
     };
   }
 }
