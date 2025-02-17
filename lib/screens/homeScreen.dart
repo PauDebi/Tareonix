@@ -39,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     barrierDismissible: false, // Bloquea el cierre al tocar fuera
     transitionDuration: const Duration(milliseconds: 300),
      pageBuilder: (context, animation, secondaryAnimation) {
-      return WillPopScope(
-        onWillPop: () async => false, // Bloquea el botón de retroceso
+      return PopScope(
+        canPop: false, // Bloquea el botón de retroceso
         child: const EntryDialog(), // Usa el LoginPage
       );
     },
