@@ -11,16 +11,28 @@ class EntryDialog extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-       builder: (context) {
+      builder: (context) {
         if (state is AuthShowSignUp) {
-          return const SignUpSignInForm(signUp: true);
+          return SignUpSignInForm(signUp: true);
         } else if (state is AuthShowLogIn) {
-          return const SignUpSignInForm(signUp: false);
+          return SignUpSignInForm(signUp: false);
         } else {
-          return const SignUpSignInForm(signUp: false,); // Default
+          return SignUpSignInForm(signUp: false); // Default
         }
       },
     );
+  }
+
+  /// Cierra los modales abiertos:
+  void _closeDialogs(BuildContext context) {
+    // Si se encuentra un bottom sheet (o cualquier ruta extra), se cierra.
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+    // Se cierra el diálogo general.
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -29,42 +41,54 @@ class EntryDialog extends StatelessWidget {
       listener: (context, state) {
         if (state is AuthShowSignUp || state is AuthShowLogIn) {
           _showSignUpSignInForm(context, state);
+        } else if (state is AuthLoggedIn) {
+          // Cuando se logea correctamente, se cierran ambos modales:
+          _closeDialogs(context);
         }
       },
-    child: Stack(
-      children: [
-        GestureDetector(
-          onTap: () {}, // Evita que se cierre al tocar fuera
-          child: Container(
-            color: Colors.black26, // Oscurece el fondo
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 27, 27, 27),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {}, // Evita que se cierre al tocar fuera
+            child: Container(
+              color: Colors.black26, // Oscurece el fondo
+              width: double.infinity,
+              height: double.infinity,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Welcome to Tareonix',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white, decoration: TextDecoration.none),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Let's organize the things.",
-                  style: TextStyle(fontSize: 16, color: Colors.white70, decoration: TextDecoration.none),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 27, 27, 27),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Welcome to Tareonix',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Let's organize the things.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                      decoration: TextDecoration.none,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
@@ -76,7 +100,7 @@ class EntryDialog extends StatelessWidget {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 10, 10, 10),
+                      backgroundColor: Color.fromARGB(255, 10, 10, 10),
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white),
                       minimumSize: const Size(double.infinity, 50),
@@ -87,7 +111,7 @@ class EntryDialog extends StatelessWidget {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 10, 10, 10),
+                      backgroundColor: Color.fromARGB(255, 10, 10, 10),
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white),
                       minimumSize: const Size(double.infinity, 50),
