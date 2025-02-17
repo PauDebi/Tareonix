@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/screens/SignUp_SignIn/entryDialog.dart';
-import 'package:taskly/screens/projectScreen.dart'; // Asegúrate de importar ProjectScreen
+import 'package:taskly/screens/projectScreen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final String? userImageUrl;
-  final String userName;
+  final User? user;
 
-  const HomeScreen({
-    this.userImageUrl,
-    required this.userName,
-    Key? key,
-  }) : super(key: key);
+  const HomeScreen({Key? key, this.user}) : super(key: key);
+
 
   void _showLoginDialog(BuildContext context) {
+    if (user != null) return;
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
@@ -96,19 +94,20 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Trello's Competency"),
         actions: [
-          IconButton(
-            icon: userImageUrl?.isNotEmpty == true
-                ? CircleAvatar(backgroundImage: NetworkImage(userImageUrl!))
-                : CircleAvatar(
-                    child: Text(
-                      userName[0].toUpperCase(),
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-            onPressed: () {
-              print("Usuario clickeado");
-            },
-          ),
+          if (user != null)
+            IconButton(
+              icon: user!.imageUrl != null
+            ? CircleAvatar(backgroundImage: NetworkImage(user!.imageUrl!))
+            : CircleAvatar(
+                child: Text(
+            user!.name[0].toUpperCase(),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              onPressed: () {
+          print("Usuario clickeado");
+              },
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
