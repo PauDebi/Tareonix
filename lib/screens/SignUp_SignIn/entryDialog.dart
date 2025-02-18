@@ -109,6 +109,7 @@ class EntryDialog extends StatelessWidget {
                     child: const Text('Log in'),
                   ),
                   const SizedBox(height: 10),
+                  /*
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 10, 10),
@@ -121,6 +122,7 @@ class EntryDialog extends StatelessWidget {
                     },
                     child: const Text('Sign in with Google'),
                   ),
+                  */
                 ],
               ),
             ),
