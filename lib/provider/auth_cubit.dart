@@ -101,6 +101,7 @@ class AuthCubit extends Cubit<AuthState> {
     await secureStorage.delete(key: "token");
     await deleteUser();
     emit(AuthLoggedOut());
+    
   }
 
   Future<String?> getToken() async {

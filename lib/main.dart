@@ -4,6 +4,7 @@ import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/screens/homeScreen.dart';
+import 'package:taskly/screens/projectScreen.dart';
 
 void main() {
   runApp(
@@ -42,7 +43,12 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',
-            home: HomeScreen(user: user)
+            home: ProjectScreen(),
+            routes: {
+              '/login': (context) => HomeScreen(user: user),
+              '/signup': (context) => HomeScreen(user: user),
+              '/project': (context) => ProjectScreen(),
+            },
           );
         }
       },
