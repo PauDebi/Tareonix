@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
+import 'package:taskly/screens/SignUp_SignIn/singInScreen.dart';
+import 'package:taskly/screens/SignUp_SignIn/singUpScreen.dart';
 import 'package:taskly/screens/homeScreen.dart';
 import 'package:taskly/screens/projectScreen.dart';
 
@@ -31,10 +33,17 @@ class MyApp extends StatelessWidget {
         } 
         
         else if (!snapshot.hasData) {
+          User? user = snapshot.data;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',
             home: HomeScreen(),
+            routes: {
+              '/login': (context) => SignInScreen(),
+              '/signup': (context) => SignUpScreen(),
+              '/home': (context) => HomeScreen(),
+              '/project': (context) => ProjectScreen(),
+            },
           );
         } 
         
@@ -45,8 +54,9 @@ class MyApp extends StatelessWidget {
             title: 'Taskly App',
             home: ProjectScreen(),
             routes: {
-              '/login': (context) => HomeScreen(user: user),
-              '/signup': (context) => HomeScreen(user: user),
+              '/login': (context) => SignInScreen(),
+              '/signup': (context) => SignUpScreen(),
+              '/home': (context) => HomeScreen(),
               '/project': (context) => ProjectScreen(),
             },
           );

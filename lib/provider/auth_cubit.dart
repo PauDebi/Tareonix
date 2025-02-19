@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:taskly/models/User.dart';
+import 'package:taskly/provider/project_cubit.dart';
 
 part 'auth_state.dart';
 
@@ -63,13 +64,15 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     final url = Uri.parse('http://worldgames.es/api/auth/login');
+    final requestBody = jsonEncode({
+      "email": email,
+      "password": password,
+    });
+
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
+      body: requestBody,
     );
 
     if (response.statusCode == 200) {

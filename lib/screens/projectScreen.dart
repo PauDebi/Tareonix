@@ -45,8 +45,7 @@ class ProjectScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 context.read<AuthCubit>().logout();
-                Navigator.of(context).pop(); // Cerrar el diálogo
-                Navigator.of(context).pushReplacementNamed('/login'); // Redirigir a la pantalla de inicio de sesión
+                Navigator.of(context).pop();
               },
               child: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
             ),
@@ -70,7 +69,6 @@ class ProjectScreen extends StatelessWidget {
                 return IconButton(
                   icon: Icon(Icons.error, color: Colors.red),
                   onPressed: () {
-                    
                   }, // Acción en caso de error
                 );
               }
@@ -96,7 +94,10 @@ class ProjectScreen extends StatelessWidget {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, authState) {
           if (authState is AuthLoggedOut) {
-            Navigator.of(context).pushReplacementNamed('/login');
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/home',
+                      (Route<dynamic> route) => false
+                );
           }
         },
         child: BlocBuilder<ProjectCubit, ProjectState>(

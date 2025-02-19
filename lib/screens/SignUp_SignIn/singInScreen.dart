@@ -30,14 +30,18 @@ class SignInScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final String email = emailController.text.trim();
                 final String password = passwordController.text.trim();
 
                 if (email.isNotEmpty && password.isNotEmpty) {
-                  context.read<AuthCubit>().logIn(email, password);
+                  await context.read<AuthCubit>().logIn(email, password);
                   if (context.read<AuthCubit>().state is AuthLoggedIn) {
-                    Navigator.of(context).pushReplacementNamed('/project');
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/project',
+                      (Route<dynamic> route) => false,
+                      arguments: context.read<AuthCubit>().getUser(),
+                    );
                   }
                 }
               },
