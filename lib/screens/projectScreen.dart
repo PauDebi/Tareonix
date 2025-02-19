@@ -190,7 +190,7 @@ class ProjectScreen extends StatelessWidget {
                             Icon(Icons.arrow_forward_ios, color: Colors.grey),
                         onTap: () {
                           Navigator.of(context)
-                              .pushNamed('/projectDetails', arguments: project);
+                              .pushNamed('/projectDetails');
                         },
                       ),
                     );

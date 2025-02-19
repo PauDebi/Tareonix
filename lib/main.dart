@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
               '/signup': (context) => SignUpScreen(),
               '/home': (context) => HomeScreen(),
               '/project': (context) => ProjectScreen(),
+              '/projectDetails': (context) => ProjectDetailScreen(),
             },
           );
         }
