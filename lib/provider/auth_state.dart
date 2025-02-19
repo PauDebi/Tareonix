@@ -14,14 +14,15 @@ class AuthShowLogIn extends AuthState {}
 class AuthShowGoogleSignIn extends AuthState {}
 
 class AuthLoggedIn extends AuthState {
-  final String userName;
-  final String? userImageUrl;
+  final User user;
 
-  AuthLoggedIn({required this.userName, this.userImageUrl});
+  AuthLoggedIn({required this.user});
 
   @override
-  List<Object?> get props => [userName, userImageUrl];
+  List<Object?> get props => [user];
 }
+
+class AuthLoading extends AuthState {}
 
 class AuthLoggedOut extends AuthState {}
 

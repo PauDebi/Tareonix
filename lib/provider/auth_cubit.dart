@@ -70,7 +70,7 @@ class AuthCubit extends Cubit<AuthState> {
       await secureStorage.write(key: "token", value: token);
       await saveUser(user);
 
-      emit(AuthLoggedIn(userName: user.name, userImageUrl: user.profile_image));
+      emit(AuthLoggedIn(user: user));
     } else {
       final responseData = jsonDecode(response.body);
       String errorMessage =
@@ -103,59 +103,61 @@ class AuthCubit extends Cubit<AuthState> {
     await secureStorage.write(key: "user_data", value: userJson);
   }
 
-Future<User?> getUser() async {
-  print("Getting user from API");
+  Future<User?> getUser() async {
+    print("Getting user from API");
+    emit(AuthLoading());
 
-  // Obtener el token desde el almacenamiento seguro
-  String? token = await getToken();
+    // Obtener el token desde el almacenamiento seguro
+    String? token = await getToken();
 
-  if (token == null) {
-    // Si no hay token, el usuario no está autenticado
-    emit(AuthError(errorMessage: "Usuario no autenticado"));
-    return null;
-  }
-
-  // Realizar la solicitud GET para obtener los datos del usuario desde la API
-  final url = Uri.parse('http://worldgames.es/api/user');
-  final response = await http.get(
-    url,
-    headers: {"Authorization": "Bearer $token"},
-  );
-
-  if (response.statusCode == 200) {
-    // Si la solicitud es exitosa, parseamos los datos del usuario
-    final responseData = jsonDecode(response.body);
-    final user = User.fromJson(responseData);
-
-    // Guardar los datos del usuario en el almacenamiento seguro
-    await saveUser(user);
-
-    return user;
-  } else {
-    // Si la solicitud falla, intentamos obtener el usuario guardado localmente
-    print("Error al obtener datos de la API. Intentando recuperar datos locales...");
-    
-    // Recuperamos el usuario guardado en local
-    User? localUser = await getUserFromStorage();
-
-    if (localUser != null) {
-      print("Usuario recuperado desde almacenamiento local.");
-      return localUser;
-    } else {
-      // Si no hay usuario local, emitimos un error
-      final responseData = jsonDecode(response.body);
-      String errorMessage = responseData['error'] ?? 'Error al obtener los datos del usuario';
-      emit(AuthError(errorMessage: errorMessage));
+    if (token == null) {
+      // Si no hay token, el usuario no está autenticado
+      emit(AuthError(errorMessage: "Usuario no autenticado"));
       return null;
     }
-  }
-}
 
-Future<User?> getUserFromStorage() async {
-  String? userJson = await secureStorage.read(key: "user_data");
-  if (userJson == null) return null;
-  return User.fromJson(jsonDecode(userJson));
-}
+    // Realizar la solicitud GET para obtener los datos del usuario desde la API
+    final url = Uri.parse('http://worldgames.es/api/user');
+    final response = await http.get(
+      url,
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    if (response.statusCode == 200) {
+      // Si la solicitud es exitosa, parseamos los datos del usuario
+      final responseData = jsonDecode(response.body);
+      final user = User.fromJson(responseData);
+
+      // Guardar los datos del usuario en el almacenamiento seguro
+      await saveUser(user);
+      emit(AuthLoggedIn(user: user));
+
+      return user;
+    } else {
+      // Si la solicitud falla, intentamos obtener el usuario guardado localmente
+      print("Error al obtener datos de la API. Intentando recuperar datos locales...");
+      
+      // Recuperamos el usuario guardado en local
+      User? localUser = await getUserFromStorage();
+
+      if (localUser != null) {
+        print("Usuario recuperado desde almacenamiento local.");
+        return localUser;
+      } else {
+        // Si no hay usuario local, emitimos un error
+        final responseData = jsonDecode(response.body);
+        String errorMessage = responseData['error'] ?? 'Error al obtener los datos del usuario';
+        emit(AuthError(errorMessage: errorMessage));
+        return null;
+      }
+    }
+  }
+
+  Future<User?> getUserFromStorage() async {
+    String? userJson = await secureStorage.read(key: "user_data");
+    if (userJson == null) return null;
+    return User.fromJson(jsonDecode(userJson));
+  }
 
 
   Future<void> deleteUser() async {
@@ -164,6 +166,7 @@ Future<User?> getUserFromStorage() async {
 
   Future<void> updateProfileImage() async {
     print("Updating profile image");
+    emit(AuthLoading());
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -190,22 +193,15 @@ Future<User?> getUserFromStorage() async {
       print(response.statusCode);
 
       if (response.statusCode == 200) {
-        final responseData =
-            jsonDecode(await response.stream.bytesToString());
-        final String newImageUrl = responseData['imagePath'];
-
         // Obtener el usuario actual y actualizar su imagen
         final user = await getUser();
-        if (user != null) {
-          final updatedUser = user.copyWith(profile_image: newImageUrl);
-          await saveUser(updatedUser);
 
-          emit(AuthLoggedIn(userName: updatedUser.name, userImageUrl: updatedUser.profile_image));
-        }
+        emit(AuthLoggedIn(user: user!));
       } else {
         emit(AuthError(errorMessage: "Error al subir la imagen"));
       }
     } catch (e) {
+      print(e);
       emit(AuthError(errorMessage: "Error de conexión"));
     }
   }

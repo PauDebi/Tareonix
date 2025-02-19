@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
-import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
 

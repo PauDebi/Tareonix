@@ -40,10 +40,14 @@ class SignInScreen extends StatelessWidget {
                   if (context.read<AuthCubit>().state is AuthLoggedIn) {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       '/project',
-                      (Route<dynamic> route) => false,
-                      arguments: context.read<AuthCubit>().getUser(),
+                      (Route<dynamic> route) => false
                     );
                   }
+                }
+                else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Por favor, rellene todos los campos')),
+                  );
                 }
               },
               child: const Text('Iniciar Sesión'),

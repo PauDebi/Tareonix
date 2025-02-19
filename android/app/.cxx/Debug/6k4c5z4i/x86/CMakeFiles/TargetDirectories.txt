@@ -1,0 +1,2 @@
+C:/Users/paude/Documents/Taskly/clone/taskly/android/app/.cxx/Debug/6k4c5z4i/x86/CMakeFiles/edit_cache.dir
+C:/Users/paude/Documents/Taskly/clone/taskly/android/app/.cxx/Debug/6k4c5z4i/x86/CMakeFiles/rebuild_cache.dir
