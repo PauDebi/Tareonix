@@ -6,6 +6,7 @@ import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/screens/SignUp_SignIn/singInScreen.dart';
 import 'package:taskly/screens/SignUp_SignIn/singUpScreen.dart';
 import 'package:taskly/screens/homeScreen.dart';
+import 'package:taskly/screens/projectDetailScreen.dart';
 import 'package:taskly/screens/projectScreen.dart';
 
 void main() {
@@ -27,11 +28,9 @@ class MyApp extends StatelessWidget {
     return FutureBuilder<User?>(
       future: context.read<AuthCubit>().getUser(),
       builder: (context, snapshot) {
-        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
-        } 
-        else if (!snapshot.hasData) {
+        } else if (!snapshot.hasData) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',
@@ -41,11 +40,10 @@ class MyApp extends StatelessWidget {
               '/signup': (context) => SignUpScreen(),
               '/home': (context) => HomeScreen(),
               '/project': (context) => ProjectScreen(),
+              '/projectDetails': (context) => ProjectDetailScreen(),
             },
           );
-        } 
-        
-        else {
+        } else {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',

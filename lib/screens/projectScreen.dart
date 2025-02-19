@@ -6,8 +6,7 @@ import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 
 class ProjectScreen extends StatelessWidget {
-
- void _showAddProjectDialog(BuildContext context) {
+  void _showAddProjectDialog(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
     showDialog(
@@ -20,7 +19,8 @@ class ProjectScreen extends StatelessWidget {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nombre del proyecto'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre del proyecto'),
               ),
               TextField(
                 controller: descriptionController,
@@ -54,48 +54,52 @@ class ProjectScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<ProjectCubit>().loadProjects();
     void _showUserDialog(BuildContext context, User user) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Perfil de Usuario'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-            GestureDetector(
-                //onTap: () => _pickImage(context, user),
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage: user.imageUrl != null && user.imageUrl!.isNotEmpty
-                      ? NetworkImage(user.imageUrl!)
-                      : null,
-                  child: user.imageUrl == null || user.imageUrl!.isEmpty
-                      ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
-                      : null,
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Perfil de Usuario'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  //onTap: () => _pickImage(context, user),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage:
+                        user.imageUrl != null && user.imageUrl!.isNotEmpty
+                            ? NetworkImage(user.imageUrl!)
+                            : null,
+                    child: user.imageUrl == null || user.imageUrl!.isEmpty
+                        ? const Icon(Icons.camera_alt,
+                            size: 40, color: Colors.grey)
+                        : null,
+                  ),
                 ),
+                const SizedBox(height: 10),
+                Text("Nombre: ${user.name}",
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text("Email: ${user.email}"),
+                Text("Fecha de Creacion: ${user.createdAt}")
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cerrar'),
               ),
-              const SizedBox(height: 10),
-              Text("Nombre: ${user.name}", style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text("Email: ${user.email}"),
-              Text("Fecha de Creacion: ${user.createdAt}")
+              TextButton(
+                onPressed: () {
+                  context.read<AuthCubit>().logout();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cerrar sesión',
+                    style: TextStyle(color: Colors.red)),
+              ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<AuthCubit>().logout();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
+          );
+        },
+      );
     }
 
     return Scaffold(
@@ -111,19 +115,20 @@ class ProjectScreen extends StatelessWidget {
               if (snapshot.hasError || !snapshot.hasData) {
                 return IconButton(
                   icon: Icon(Icons.error, color: Colors.red),
-                  onPressed: () {
-                  }, // Acción en caso de error
+                  onPressed: () {}, // Acción en caso de error
                 );
               }
 
               final user = snapshot.data!;
               return IconButton(
                 icon: user.imageUrl != null
-                    ? CircleAvatar(backgroundImage: NetworkImage(user.imageUrl!))
+                    ? CircleAvatar(
+                        backgroundImage: NetworkImage(user.imageUrl!))
                     : CircleAvatar(
                         child: Text(
                           user.name[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                 onPressed: () {
@@ -138,9 +143,7 @@ class ProjectScreen extends StatelessWidget {
         listener: (context, authState) {
           if (authState is AuthLoggedOut) {
             Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/home',
-                      (Route<dynamic> route) => false
-                );
+                '/home', (Route<dynamic> route) => false);
           }
         },
         child: BlocBuilder<ProjectCubit, ProjectState>(
@@ -148,7 +151,8 @@ class ProjectScreen extends StatelessWidget {
             if (state is ProjectLoading) {
               return Center(child: CircularProgressIndicator());
             } else if (state is ProjectLoaded) {
-              state.projects.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+              state.projects.sort((a, b) =>
+                  a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
               return RefreshIndicator(
                 onRefresh: () async {
@@ -173,7 +177,8 @@ class ProjectScreen extends StatelessWidget {
                         ),
                         title: Text(
                           project.name,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
                           project.description,
@@ -181,9 +186,11 @@ class ProjectScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(color: Colors.grey[700]),
                         ),
-                        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                        trailing:
+                            Icon(Icons.arrow_forward_ios, color: Colors.grey),
                         onTap: () {
-                          // Acción al tocar el proyecto
+                          Navigator.of(context)
+                              .pushNamed('/projectDetails', arguments: project);
                         },
                       ),
                     );
