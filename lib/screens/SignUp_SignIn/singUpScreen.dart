@@ -36,13 +36,16 @@ class SignUpScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async{
                 final String name = nameController.text.trim();
                 final String email = emailController.text.trim();
                 final String password = passwordController.text.trim();
 
                 if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-                  context.read<AuthCubit>().signUp(name, email, password);
+                  await context.read<AuthCubit>().signUp(name, email, password);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Usuario registrado correctamente, se ha enviado un correo de verificación')),
+                  );
                     Navigator.of(context).pushReplacementNamed('/login');
                 }
                 else {

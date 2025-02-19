@@ -31,9 +31,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
         } 
-        
         else if (!snapshot.hasData) {
-          User? user = snapshot.data;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',
@@ -48,7 +46,6 @@ class MyApp extends StatelessWidget {
         } 
         
         else {
-          User user = snapshot.data!;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taskly App',

@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:taskly/models/User.dart';
-import 'package:taskly/provider/project_cubit.dart';
 
 part 'auth_state.dart';
 
