@@ -15,18 +15,6 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit() : super(AuthInitial());
 
-  void showSignUp() {
-    emit(AuthShowSignUp());
-  }
-
-  void showLogIn() {
-    emit(AuthShowLogIn());
-  }
-
-  void showGoogleSignIn() {
-    emit(AuthShowGoogleSignIn());
-  }
-
   /// Registra al usuario y, en lugar de iniciar sesión automáticamente,
   /// emite un estado indicando que se debe verificar el email.
   Future<void> signUp(String name, String email, String password) async {
@@ -60,10 +48,6 @@ class AuthCubit extends Cubit<AuthState> {
   /// Realiza el login. Si el usuario no ha verificado el email,
   /// se emite un estado indicando que debe verificarlo.
   Future<void> logIn(String email, String password) async {
-    if (email.isEmpty || password.isEmpty) {
-      emit(AuthShowLogIn());
-      return;
-    }
 
     final url = Uri.parse('http://worldgames.es/api/auth/login');
     final requestBody = jsonEncode({
@@ -114,60 +98,115 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> saveUser(User user) async {
+    print("Saving user");
     String userJson = jsonEncode(user.toJson());
     await secureStorage.write(key: "user_data", value: userJson);
   }
 
-  Future<User?> getUser() async {
-    String? userJson = await secureStorage.read(key: "user_data");
-    if (userJson == null) return null;
-    return User.fromJson(jsonDecode(userJson));
+Future<User?> getUser() async {
+  print("Getting user from API");
+
+  // Obtener el token desde el almacenamiento seguro
+  String? token = await getToken();
+
+  if (token == null) {
+    // Si no hay token, el usuario no está autenticado
+    emit(AuthError(errorMessage: "Usuario no autenticado"));
+    return null;
   }
+
+  // Realizar la solicitud GET para obtener los datos del usuario desde la API
+  final url = Uri.parse('http://worldgames.es/api/user');
+  final response = await http.get(
+    url,
+    headers: {"Authorization": "Bearer $token"},
+  );
+
+  if (response.statusCode == 200) {
+    // Si la solicitud es exitosa, parseamos los datos del usuario
+    final responseData = jsonDecode(response.body);
+    final user = User.fromJson(responseData);
+
+    // Guardar los datos del usuario en el almacenamiento seguro
+    await saveUser(user);
+
+    return user;
+  } else {
+    // Si la solicitud falla, intentamos obtener el usuario guardado localmente
+    print("Error al obtener datos de la API. Intentando recuperar datos locales...");
+    
+    // Recuperamos el usuario guardado en local
+    User? localUser = await getUserFromStorage();
+
+    if (localUser != null) {
+      print("Usuario recuperado desde almacenamiento local.");
+      return localUser;
+    } else {
+      // Si no hay usuario local, emitimos un error
+      final responseData = jsonDecode(response.body);
+      String errorMessage = responseData['error'] ?? 'Error al obtener los datos del usuario';
+      emit(AuthError(errorMessage: errorMessage));
+      return null;
+    }
+  }
+}
+
+Future<User?> getUserFromStorage() async {
+  String? userJson = await secureStorage.read(key: "user_data");
+  if (userJson == null) return null;
+  return User.fromJson(jsonDecode(userJson));
+}
+
 
   Future<void> deleteUser() async {
     await secureStorage.delete(key: "user_data");
   }
 
   Future<void> updateProfileImage() async {
-  final picker = ImagePicker();
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    print("Updating profile image");
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  if (pickedFile == null) return; // Usuario canceló la selección
+    if (pickedFile == null) return; // Usuario canceló la selección
 
-  final File imageFile = File(pickedFile.path);
-  final String? token = await getToken();
+    final File imageFile = File(pickedFile.path);
+    final String? token = await getToken();
 
-  if (token == null) {
-    emit(AuthError(errorMessage: "Usuario no autenticado"));
-    return;
-  }
-
-  final url = Uri.parse('http://worldgames.es/api/profile-image');
-  final request = http.MultipartRequest('PUT', url)
-    ..headers['Authorization'] = 'Bearer $token'
-    ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
-
-  try {
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      final responseData =
-          jsonDecode(await response.stream.bytesToString());
-      final String newImageUrl = responseData['imagePath'];
-
-      // Obtener el usuario actual y actualizar su imagen
-      final user = await getUser();
-      if (user != null) {
-        final updatedUser = user.copyWith(profile_image: newImageUrl);
-        await saveUser(updatedUser);
-
-        emit(AuthLoggedIn(userName: updatedUser.name, userImageUrl: updatedUser.profile_image));
-      }
-    } else {
-      emit(AuthError(errorMessage: "Error al subir la imagen"));
+    if (token == null) {
+      emit(AuthError(errorMessage: "Usuario no autenticado"));
+      return;
     }
-  } catch (e) {
-    emit(AuthError(errorMessage: "Error de conexión"));
+    print("Image selected, uploading...");
+
+    final url = Uri.parse('http://worldgames.es/api/user/profile-image');
+    final request = http.MultipartRequest('PUT', url)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+    try {
+      print("Sending request...");
+      final response = await request.send();
+      print("Request sent");
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        final responseData =
+            jsonDecode(await response.stream.bytesToString());
+        final String newImageUrl = responseData['imagePath'];
+
+        // Obtener el usuario actual y actualizar su imagen
+        final user = await getUser();
+        if (user != null) {
+          final updatedUser = user.copyWith(profile_image: newImageUrl);
+          await saveUser(updatedUser);
+
+          emit(AuthLoggedIn(userName: updatedUser.name, userImageUrl: updatedUser.profile_image));
+        }
+      } else {
+        emit(AuthError(errorMessage: "Error al subir la imagen"));
+      }
+    } catch (e) {
+      emit(AuthError(errorMessage: "Error de conexión"));
+    }
   }
-}
 }
