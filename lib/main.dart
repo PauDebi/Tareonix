@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
+import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/screens/SignUp_SignIn/singInScreen.dart';
 import 'package:taskly/screens/SignUp_SignIn/singUpScreen.dart';
 import 'package:taskly/screens/homeScreen.dart';
@@ -15,6 +17,7 @@ void main() {
       providers: [
         BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
         BlocProvider<ProjectCubit>(create: (_) => ProjectCubit()),
+        BlocProvider<TaskCubit>(create: (_) => TaskCubit()),
       ],
       child: const MyApp(),
     ),
