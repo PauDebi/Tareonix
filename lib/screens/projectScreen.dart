@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
@@ -7,6 +6,50 @@ import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 
 class ProjectScreen extends StatelessWidget {
+
+ void _showAddProjectDialog(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Agregar Proyecto'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre del proyecto'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                final String name = nameController.text.trim();
+                final String description = descriptionController.text.trim();
+                if (name.isNotEmpty && description.isNotEmpty) {
+                  context.read<ProjectCubit>().createProject(name, description);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     context.read<ProjectCubit>().loadProjects();
@@ -154,6 +197,10 @@ class ProjectScreen extends StatelessWidget {
             }
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddProjectDialog(context),
+        child: const Icon(Icons.add),
       ),
     );
   }
