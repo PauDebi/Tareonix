@@ -3,14 +3,14 @@ class User {
   final DateTime createdAt;
   final String name;
   final String email;
-  final String? imageUrl;
+  final String? profile_image;
 
   User({
     required this.id,
     required this.createdAt,
     required this.name,
     required this.email,
-    this.imageUrl
+    this.profile_image
   });
 
   // Convertir JSON a un objeto User
@@ -20,7 +20,7 @@ class User {
       createdAt: DateTime.parse(json['createdAt']),
       name: json['name'],
       email: json['email'],
-      imageUrl: json['imageUrl']
+      profile_image: json['profile_image']
     );
   }
 
@@ -31,7 +31,23 @@ class User {
       'createdAt': createdAt.toIso8601String(),
       'name': name,
       'email': email,
-      'imageUrl': imageUrl
+      'profile_image': profile_image
     };
+  }
+
+  User copyWith({
+    String? id,
+    DateTime? createdAt,
+    String? name,
+    String? email,
+    String? profile_image,
+  }) {
+    return User(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      profile_image: profile_image ?? this.profile_image,
+    );
   }
 }

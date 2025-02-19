@@ -63,14 +63,14 @@ class ProjectScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 GestureDetector(
-                  //onTap: () => _pickImage(context, user),
+                  onTap: () => context.read<AuthCubit>().updateProfileImage(),
                   child: CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                        user.imageUrl != null && user.imageUrl!.isNotEmpty
-                            ? NetworkImage(user.imageUrl!)
+                        user.profile_image != null && user.profile_image!.isNotEmpty
+                            ? NetworkImage(user.profile_image!)
                             : null,
-                    child: user.imageUrl == null || user.imageUrl!.isEmpty
+                    child: user.profile_image == null || user.profile_image!.isEmpty
                         ? const Icon(Icons.camera_alt,
                             size: 40, color: Colors.grey)
                         : null,
@@ -121,9 +121,9 @@ class ProjectScreen extends StatelessWidget {
 
               final user = snapshot.data!;
               return IconButton(
-                icon: user.imageUrl != null
+                icon: user.profile_image != null
                     ? CircleAvatar(
-                        backgroundImage: NetworkImage(user.imageUrl!))
+                        backgroundImage: NetworkImage(user.profile_image!))
                     : CircleAvatar(
                         child: Text(
                           user.name[0].toUpperCase(),

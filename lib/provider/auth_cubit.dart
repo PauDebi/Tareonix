@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:taskly/models/User.dart';
 
 part 'auth_state.dart';
@@ -83,7 +86,7 @@ class AuthCubit extends Cubit<AuthState> {
       await secureStorage.write(key: "token", value: token);
       await saveUser(user);
 
-      emit(AuthLoggedIn(userName: user.name, userImageUrl: user.imageUrl));
+      emit(AuthLoggedIn(userName: user.name, userImageUrl: user.profile_image));
     } else {
       final responseData = jsonDecode(response.body);
       String errorMessage =
@@ -124,4 +127,47 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> deleteUser() async {
     await secureStorage.delete(key: "user_data");
   }
+
+  Future<void> updateProfileImage() async {
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile == null) return; // Usuario canceló la selección
+
+  final File imageFile = File(pickedFile.path);
+  final String? token = await getToken();
+
+  if (token == null) {
+    emit(AuthError(errorMessage: "Usuario no autenticado"));
+    return;
+  }
+
+  final url = Uri.parse('http://worldgames.es/api/profile-image');
+  final request = http.MultipartRequest('PUT', url)
+    ..headers['Authorization'] = 'Bearer $token'
+    ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+  try {
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData =
+          jsonDecode(await response.stream.bytesToString());
+      final String newImageUrl = responseData['imagePath'];
+
+      // Obtener el usuario actual y actualizar su imagen
+      final user = await getUser();
+      if (user != null) {
+        final updatedUser = user.copyWith(profile_image: newImageUrl);
+        await saveUser(updatedUser);
+
+        emit(AuthLoggedIn(userName: updatedUser.name, userImageUrl: updatedUser.profile_image));
+      }
+    } else {
+      emit(AuthError(errorMessage: "Error al subir la imagen"));
+    }
+  } catch (e) {
+    emit(AuthError(errorMessage: "Error de conexión"));
+  }
+}
 }
