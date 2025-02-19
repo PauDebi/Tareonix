@@ -5,7 +5,9 @@ import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
-  const ProjectDetailScreen({Key? key}) : super(key: key);
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  ProjectDetailScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +23,84 @@ class ProjectDetailScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => TaskCubit()..fetchTasks(project),
       child: Scaffold(
+         key: _scaffoldKey,
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();  // Abrir el Drawer con la clave global
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                // Acción para agregar tareas
+              },
+            ),
+          ],
           title: Text(
-            project.name,
+            project.name[0].toUpperCase() + project.name.substring(1),
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text('Nombre del Usuario'),
+                accountEmail: Text('usuario@example.com'),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.account_circle, size: 50),
+                ),
+              ),
+              // Usuarios
+              ExpansionTile(
+                title: Text('Usuarios'),
+                leading: Icon(Icons.people),
+                children: <Widget>[
+                  ListTile(
+                    title: Text('Ver usuarios'),
+                    onTap: () {
+                      // Acción para ver los usuarios
+                      Navigator.pop(context); // Cierra el Drawer
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Añadir usuario'),
+                    onTap: () {
+                      // Acción para añadir usuario
+                      Navigator.pop(context); // Cierra el Drawer
+                    },
+                  ),
+                ],
+              ),
+              // Detalles
+              ExpansionTile(
+                title: Text('Detalles'),
+                leading: Icon(Icons.info),
+                children: <Widget>[
+                  ListTile(
+                    title: Text('Ver detalles del proyecto'),
+                    onTap: () {
+                      // Acción para ver los detalles del proyecto
+                      Navigator.pop(context); // Cierra el Drawer
+                    },
+                  ),
+                ],
+              ),
+              // Eliminar proyecto
+              ListTile(
+                title: Text('Eliminar proyecto'),
+                leading: Icon(Icons.delete, color: Colors.red),
+                onTap: () {
+                  // Acción para eliminar el proyecto
+                  Navigator.pop(context); // Cierra el Drawer
+                },
+              ),
+            ],
           ),
         ),
         body: Padding(
@@ -32,11 +108,6 @@ class ProjectDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                project.description,
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              ),
-              const SizedBox(height: 20),
               const Text(
                 "Tareas del Proyecto",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
