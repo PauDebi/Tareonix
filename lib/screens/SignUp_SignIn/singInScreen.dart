@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/provider/auth_cubit.dart';
+import 'package:taskly/widgets/TextField.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -17,16 +18,16 @@ class SignInScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
+            CustomTextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Correo Electrónico'),
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: 'email',
+              hint: 'Correo Electrónico',
             ),
             const SizedBox(height: 10),
-            TextField(
+            CustomTextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Contraseña'),
-              obscureText: true,
+              hint: 'Contraseña',
+              isPassword: true,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
