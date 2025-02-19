@@ -16,17 +16,12 @@ class ProjectDetailScreen extends StatelessWidget {
   }
 
     return Scaffold(
-      appBar: AppBar(title: Text(project.name)),
+      appBar: AppBar(title: Text(project.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              project.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
             Text(
               project.description,
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
