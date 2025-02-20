@@ -51,9 +51,6 @@ class ProjectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<ProjectCubit>().loadProjects();
-    context.read<AuthCubit>().getUser();
-
     void _showUserDialog(BuildContext context) {
       showDialog(
         context: context,
@@ -160,8 +157,10 @@ class ProjectScreen extends StatelessWidget {
         },
       );
     }
+    
 
-
+    context.read<ProjectCubit>().loadProjects();
+    context.read<AuthCubit>().getUser();
 
     return Scaffold(
       appBar: AppBar(

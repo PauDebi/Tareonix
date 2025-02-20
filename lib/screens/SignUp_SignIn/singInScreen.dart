@@ -37,10 +37,20 @@ class SignInScreen extends StatelessWidget {
 
                 if (email.isNotEmpty && password.isNotEmpty) {
                   await context.read<AuthCubit>().logIn(email, password);
-                  if (context.read<AuthCubit>().state is AuthLoggedIn) {
+                  if (context.read<AuthCubit>().state is AuthLoggedIn || context.read<AuthCubit>().state is !AuthEmailVerificationRequired) {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       '/project',
                       (Route<dynamic> route) => false
+                    );
+                  }
+                  else if (context.read<AuthCubit>().state is AuthEmailVerificationRequired) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Por favor, verifica tu email antes de iniciar sesión')),
+                    );
+                  }
+                  else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Error al iniciar sesión')),
                     );
                   }
                 }

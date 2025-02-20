@@ -65,6 +65,12 @@ class AuthCubit extends Cubit<AuthState> {
       final responseData = jsonDecode(response.body);
       final String token = responseData['token'];
       final user = User.fromJson(responseData['user']);
+      if (!user.isVerified) {
+        emit(AuthEmailVerificationRequired(
+            message:
+                'Por favor, verifica tu email antes de iniciar sesión.'));
+        return;
+      }
 
       // Guardar el token y los datos del usuario de forma segura.
       await secureStorage.write(key: "token", value: token);
@@ -142,6 +148,14 @@ class AuthCubit extends Cubit<AuthState> {
 
       if (localUser != null) {
         print("Usuario recuperado desde almacenamiento local.");
+        if (!localUser.isVerified) {
+          emit(AuthEmailVerificationRequired(
+              message:
+                  'Por favor, verifica tu email antes de iniciar sesión.'));
+          return null;
+        } 
+        print(localUser.toJson());
+        emit(AuthLoggedIn(user: localUser));
         return localUser;
       } else {
         // Si no hay usuario local, emitimos un error

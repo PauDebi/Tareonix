@@ -1,16 +1,20 @@
+import 'dart:ffi';
+
 class User {
   final String id;
   final DateTime createdAt;
   final String name;
   final String email;
   final String? profile_image;
+  final bool isVerified;
 
   User({
     required this.id,
     required this.createdAt,
     required this.name,
     required this.email,
-    this.profile_image
+    this.profile_image,
+    required this.isVerified
   });
 
   // Convertir JSON a un objeto User
@@ -20,7 +24,8 @@ class User {
       createdAt: DateTime.parse(json['createdAt']),
       name: json['name'],
       email: json['email'],
-      profile_image: json['profile_image']
+      profile_image: json['profile_image'],
+      isVerified: json['isVerified'] != null
     );
   }
 
@@ -31,7 +36,8 @@ class User {
       'createdAt': createdAt.toIso8601String(),
       'name': name,
       'email': email,
-      'profile_image': profile_image
+      'profile_image': profile_image,
+      'isVerified': isVerified
     };
   }
 
@@ -41,6 +47,7 @@ class User {
     String? name,
     String? email,
     String? profile_image,
+    bool? isVerified
   }) {
     return User(
       id: id ?? this.id,
@@ -48,6 +55,7 @@ class User {
       name: name ?? this.name,
       email: email ?? this.email,
       profile_image: profile_image ?? this.profile_image,
+      isVerified: isVerified ?? this.isVerified
     );
   }
 }
