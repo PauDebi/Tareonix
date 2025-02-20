@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
+import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
 
@@ -19,6 +20,7 @@ class ProjectDetailScreen extends StatelessWidget {
         body: const Center(child: Text("No se encontró el proyecto")),
       );
     }
+    final user = (context.read<AuthCubit>().state as AuthLoggedIn).user;
 
     return BlocProvider(
       create: (context) => TaskCubit()..fetchTasks(project),
@@ -49,11 +51,14 @@ class ProjectDetailScreen extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: <Widget>[
               UserAccountsDrawerHeader(
-                accountName: Text('Nombre del Usuario'),
-                accountEmail: Text('usuario@example.com'),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.account_circle, size: 50),
+                accountName: Text(user.name),
+                accountEmail: Text(user.email),
+                currentAccountPicture: user.profile_image != null
+                    ? CircleAvatar(
+                        backgroundImage: NetworkImage(user.profile_image!),
+                      )
+                    : CircleAvatar(
+                        child: Text(user.name[0].toUpperCase()),
                 ),
               ),
               // Usuarios
