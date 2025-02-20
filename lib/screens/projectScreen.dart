@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
+import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 
@@ -174,7 +175,7 @@ class ProjectScreen extends StatelessWidget {
                   onPressed: () => {},
                 );
                 } else if (authState is AuthLoggedIn) {
-                final user = authState.user;
+                final User user = authState.user; 
                 return IconButton(
                   icon: user.profile_image != null && user.profile_image!.isNotEmpty
                       ? CircleAvatar(

@@ -1,9 +1,12 @@
+import 'package:taskly/models/User.dart';
+
 class Project {
   final String id;
   final String name;
   final String description;
   final String? leaderId; // Puede ser nulo si no hay líder
   final DateTime createdAt;
+  final List<User?> members;
 
   Project({
     required this.id,
@@ -11,6 +14,7 @@ class Project {
     required this.description,
     this.leaderId,
     required this.createdAt,
+    this.members = const [],
   });
 
   // Convertir JSON a un objeto Project
@@ -21,6 +25,7 @@ class Project {
       description: json['description'],
       leaderId: json['lider_id'], // Puede ser null
       createdAt: DateTime.parse(json['createdAt']),
+      members: (json['users'] as List<dynamic>).map((userJson) => User.fromJson(userJson)).toList(),
     );
   }
 
@@ -32,6 +37,7 @@ class Project {
       'description': description,
       'lider_id': leaderId,
       'createdAt': createdAt.toIso8601String(),
+      'users': members.map((user) => user?.toJson()).toList(),
     };
   }
 }

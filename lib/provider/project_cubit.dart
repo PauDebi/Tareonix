@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +23,7 @@ class ProjectCubit extends Cubit<ProjectState> {
 
     print('loading projects');
 
-    projects = await fetchProjects();
+    projects = await _fetchProjects();
     
 
     print('projects loaded');
@@ -33,7 +35,7 @@ class ProjectCubit extends Cubit<ProjectState> {
     emit(ProjectLoaded(projects: projects!));
   }
 
-  Future<List<Project>?> fetchProjects() async {
+  Future<List<Project>?> _fetchProjects() async {
 
     final token = await secureStorage.read(key: "token");
     if (token == null) {
@@ -112,6 +114,37 @@ class ProjectCubit extends Cubit<ProjectState> {
     await loadProjects();
   }
 
-  
-    
+  /// Eliminar un proyecto y recargar la lista.
+  Future<void> deleteProject(Project project) async {
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(ProjectError("No se encontró un token de autenticación."));
+      return;
+    }
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/${project.id}"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Proyecto eliminado con éxito.');
+      emit(ProjectLoading()); // Emite un estado de carga mientras se elimina el proyecto
+      // Filtrar el proyecto eliminado de la lista local
+      projects?.removeWhere((p) => p.id == project.id);
+
+      // Emite el estado actualizado con la lista de proyectos
+      emit(ProjectLoaded(projects: List.from(projects!))); // Emite los proyectos actualizados
+    } else if (response.statusCode == 403) {
+      emit(ProjectError("No tienes permiso para eliminar este proyecto."));
+    } else if (response.statusCode == 404) {
+      emit(ProjectError("El proyecto no fue encontrado."));
+    } else {
+      emit(ProjectError("Error al eliminar el proyecto."));
+    }
+  }
+
 }
