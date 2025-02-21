@@ -160,7 +160,7 @@ void _showAddUserDialog(BuildContext context, String projectId) {
             onPressed: () {
               final email = emailController.text.trim();
               if (email.isNotEmpty) {
-                //context.read<ProjectCubit>().addUserToProjectByEmail(projectId, email);
+                context.read<ProjectCubit>().addUserToProjectByEmail(projectId, email);
               }
               Navigator.of(context).pop(); // Cerrar diálogo
             },
