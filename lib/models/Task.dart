@@ -4,6 +4,7 @@ class Task {
   String description;
   String projectId;
   String? assignedUserId;
+  String status;
 
   Task({
     required this.id,
@@ -11,7 +12,8 @@ class Task {
     required this.description,
     required this.projectId,
     this.assignedUserId,
-  });
+    String? status,
+  }) : status = status ?? 'TO_DO';
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
@@ -20,6 +22,7 @@ class Task {
       description: map['description'],
       projectId: map['project_id'],
       assignedUserId: map['assigned_user_id'],
+      status: map['status'],
     );
   }
 
@@ -30,6 +33,7 @@ class Task {
       'description': description,
       'project_id': projectId,
       'assigned_user_id': assignedUserId,
+      'status': status,
     };
   }
 
@@ -40,6 +44,7 @@ class Task {
       'description': description,
       'project_id': projectId,
       'assigned_user_id': assignedUserId,
+      'status': status,
     };
   }
 
@@ -50,6 +55,7 @@ class Task {
       description: json['description'],
       projectId: json['project_id'],
       assignedUserId: json['assigned_user_id'],
+      status: json['status'],
     );
   }
 }

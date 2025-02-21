@@ -84,4 +84,68 @@ class TaskCubit extends Cubit<TaskState> {
       emit(TaskError("Error de conexión: $e"));
     }
   }
+
+  Future<void> updateTask(Task task, Project project) async {
+    emit(TaskLoading());
+
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(TaskError("No hay token de autenticación"));
+      return;
+    }
+
+    try {
+      final response = await http.put(
+        Uri.parse(baseUrl + task.id.toString()),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "name": task.name,
+          "description": task.description,
+          "status": task.status,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        fetchTasks(project);
+      } else {
+        emit(TaskError("Error al actualizar la tarea (Código: ${response.statusCode})"));
+      }
+    } catch (e) {
+      emit(TaskError("Error de conexión: $e"));
+    }
+  }
+
+    Future<void> deleteTask(Task task, Project project) async {
+    emit(TaskLoading());
+
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(TaskError("No hay token de autenticación"));
+      return;
+    }
+
+    try {
+      final response = await http.delete(
+        Uri.parse(baseUrl + task.id.toString()),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        fetchTasks(project);
+      } else {
+        emit(TaskError("Error al actualizar la tarea (Código: ${response.statusCode})"));
+      }
+    } catch (e) {
+      emit(TaskError("Error de conexión: $e"));
+    }
+  }
+
+
+
 }

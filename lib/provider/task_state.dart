@@ -28,6 +28,7 @@ class TaskState extends Equatable {
 // Estados específicos
 class TaskLoading extends TaskState {
   TaskLoading() : super(tasks: [], isLoading: true);
+  
 }
 
 class TaskAdded extends TaskState {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/project_cubit.dart';
@@ -36,11 +37,14 @@ class CustomDrawer extends StatelessWidget {
               children: <Widget>[
                 // Lista de usuarios dentro del drawer
         ...project.members.map((member) => ListTile(
-              leading: CircleAvatar(
-                backgroundImage: member!.profile_image != null
-                    ? NetworkImage(member.profile_image!)
-                    : AssetImage('assets/default_avatar.png') as ImageProvider,
+              leading: member!.profile_image != null
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(member.profile_image!),
+                    )
+                  : CircleAvatar(
+                      child: Text(user.name[0].toUpperCase()),
               ),
+              onTap: () => Dialogs().showMemberDialog(context, member, isEditable),
               title: Text(member.name),
               )),
                 ListTile(

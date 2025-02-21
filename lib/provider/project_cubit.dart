@@ -144,44 +144,44 @@ class ProjectCubit extends Cubit<ProjectState> {
       emit(ProjectError("Error al eliminar el proyecto."));
     }
   }
-  
-// Esta es una función asincrónica que agrega un usuario a un proyecto usando su email.
-Future<void> addUserToProjectByEmail(String projectId, String email) async {
-  final token = await secureStorage.read(key: "token");
-  if (token == null) {
-    emit(ProjectError("No se encontró un token de autenticación."));
-    return;
-  }
-
-  try {
-    print("comienza la solicitud");
-    // Ahora enviamos el email
-    final addUserResponse = await http.post(
-      Uri.parse("$baseUrl/$projectId/add-user"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode({"user_email": email}),
-    );
-    print("termina la solicitud");
-    print(addUserResponse.statusCode);
-    print(addUserResponse.body);
-
-    if (addUserResponse.statusCode == 201) {
-      print('Usuario añadido correctamente.');
-      refreshProjects();
-      emit(ProjectUserAdded("Usuario añadido correctamente."));
-      await refreshProjects(); // Refrescar la lista de proyectos si es necesario
-    } else if (addUserResponse.statusCode == 400) {
-      emit(ProjectError("El usuario ya es miembro del proyecto."));
-    } else if (addUserResponse.statusCode == 403) {
-      emit(ProjectError("No tienes permisos para añadir usuarios a este proyecto."));
-    } else {
-      emit(ProjectError("Error al añadir el usuario al proyecto."));
+    
+  // Esta es una función asincrónica que agrega un usuario a un proyecto usando su email.
+  Future<void> addUserToProjectByEmail(String projectId, String email) async {
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(ProjectError("No se encontró un token de autenticación."));
+      return;
     }
-  } catch (e) {
-    emit(ProjectError("Error al procesar la solicitud."));
+
+    try {
+      print("comienza la solicitud");
+      // Ahora enviamos el email
+      final addUserResponse = await http.post(
+        Uri.parse("$baseUrl/$projectId/add-user"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"user_email": email}),
+      );
+      print("termina la solicitud");
+      print(addUserResponse.statusCode);
+      print(addUserResponse.body);
+
+      if (addUserResponse.statusCode == 201) {
+        print('Usuario añadido correctamente.');
+        refreshProjects();
+        emit(ProjectUserAdded("Usuario añadido correctamente."));
+        await refreshProjects(); // Refrescar la lista de proyectos si es necesario
+      } else if (addUserResponse.statusCode == 400) {
+        emit(ProjectError("El usuario ya es miembro del proyecto."));
+      } else if (addUserResponse.statusCode == 403) {
+        emit(ProjectError("No tienes permisos para añadir usuarios a este proyecto."));
+      } else {
+        emit(ProjectError("Error al añadir el usuario al proyecto."));
+      }
+    } catch (e) {
+      emit(ProjectError("Error al procesar la solicitud."));
+    }
   }
-}
 }

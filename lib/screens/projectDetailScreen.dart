@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
-import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
 import 'package:taskly/widgets/Drawer.dart';
+import 'package:taskly/widgets/TaskList.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -29,7 +29,9 @@ class ProjectDetailScreen extends StatelessWidget {
     final tasksCubit = context.read<TaskCubit>();
     bool isEditable = project.leaderId == null || project.leaderId == user.id;
 
-    Future.microtask(() => tasksCubit.fetchTasks(project));
+    if (tasksCubit.state is TaskLoading){
+      Future.microtask(() => tasksCubit.fetchTasks(project));
+    }
 
     void _showAddTaskDialog(BuildContext context, Project project) {
       final TextEditingController nameController = TextEditingController();
@@ -110,16 +112,7 @@ class ProjectDetailScreen extends StatelessWidget {
               return Center(child: Text("Error: ${state.error}"));
             } else if (state is TaskLoaded) {
               final tasks = state.tasks;
-              return ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (context, index) {
-                  final task = tasks[index];
-                  return ListTile(
-                    title: Text(task.name),
-                    subtitle: Text(task.description)
-                  );
-                },
-              );
+              return TaskList(tasks: tasks);
             }
             return Center(child: Text("No hay tareas disponibles"));
           },
