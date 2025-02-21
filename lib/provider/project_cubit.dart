@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
@@ -146,77 +144,38 @@ class ProjectCubit extends Cubit<ProjectState> {
       emit(ProjectError("Error al eliminar el proyecto."));
     }
   }
-  /*
+  
 // Esta es una función asincrónica que agrega un usuario a un proyecto usando su email.
 Future<void> addUserToProjectByEmail(String projectId, String email) async {
-  // Se obtiene el token de autenticación desde el almacenamiento seguro.
   final token = await secureStorage.read(key: "token");
-
-  // Si no se encuentra un token, se emite un error indicando que no se encontró un token de autenticación.
   if (token == null) {
     emit(ProjectError("No se encontró un token de autenticación."));
     return;
   }
 
   try {
-    // 1. Obtener el ID del usuario usando su email.
-    final userResponse = await http.get(
-      // Se hace una solicitud GET a la API para obtener el usuario con el email proporcionado.
-      // ***Falta esta solicitud en la API***
-      Uri.parse("$baseUrl/users?email=$email"),
-      headers: {
-        // Se envía el token de autorización en los encabezados de la solicitud.
-        "Authorization": "Bearer $token",
-      },
-    );
-
-    // Si la respuesta no es 200 (OK), significa que no se encontró al usuario.
-    if (userResponse.statusCode != 200) {
-      emit(ProjectError("Usuario no encontrado."));
-      return;
-    }
-
-    // Si se encuentra al usuario, se decodifica la respuesta JSON para obtener los datos del usuario.
-    final userData = jsonDecode(userResponse.body);
-    // Se extrae el ID del usuario.
-    final userId = userData["id"];
-
-    // 2. Agregar el usuario al proyecto usando su ID.
+    // Ahora enviamos el email
     final addUserResponse = await http.post(
-      // Se hace una solicitud POST a la API para agregar el usuario al proyecto.
       Uri.parse("$baseUrl/$projectId/add-user"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
       },
-      // El cuerpo de la solicitud contiene el ID del usuario que se va a agregar al proyecto.
-      body: jsonEncode({"user_id": userId}),
+      body: jsonEncode({"user_email": email}),
     );
 
-    // Si la respuesta es 201 (Creado), el usuario se agregó correctamente al proyecto.
     if (addUserResponse.statusCode == 201) {
       emit(ProjectUserAdded("Usuario añadido correctamente."));
-      // Se refrescan los proyectos para reflejar los cambios.
-      await refreshProjects();
-    } 
-    // Si la respuesta es 400, significa que el usuario ya es miembro del proyecto.
-    else if (addUserResponse.statusCode == 400) {
+      await refreshProjects(); // Refrescar la lista de proyectos si es necesario
+    } else if (addUserResponse.statusCode == 400) {
       emit(ProjectError("El usuario ya es miembro del proyecto."));
-    } 
-    // Si la respuesta es 403, significa que no tienes permisos para agregar usuarios al proyecto.
-    else if (addUserResponse.statusCode == 403) {
+    } else if (addUserResponse.statusCode == 403) {
       emit(ProjectError("No tienes permisos para añadir usuarios a este proyecto."));
-    } 
-    // Si ocurre cualquier otro error, se emite un error general.
-    else {
+    } else {
       emit(ProjectError("Error al añadir el usuario al proyecto."));
     }
   } catch (e) {
-    // Si ocurre un error al procesar la solicitud, se emite un mensaje de error.
     emit(ProjectError("Error al procesar la solicitud."));
   }
 }
-
-*/
-
 }

@@ -5,7 +5,6 @@ import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
-import 'package:taskly/screens/projectScreen.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
