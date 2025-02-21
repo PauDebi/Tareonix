@@ -154,6 +154,7 @@ Future<void> addUserToProjectByEmail(String projectId, String email) async {
   }
 
   try {
+    print("comienza la solicitud");
     // Ahora enviamos el email
     final addUserResponse = await http.post(
       Uri.parse("$baseUrl/$projectId/add-user"),
@@ -163,8 +164,13 @@ Future<void> addUserToProjectByEmail(String projectId, String email) async {
       },
       body: jsonEncode({"user_email": email}),
     );
+    print("termina la solicitud");
+    print(addUserResponse.statusCode);
+    print(addUserResponse.body);
 
     if (addUserResponse.statusCode == 201) {
+      print('Usuario añadido correctamente.');
+      refreshProjects();
       emit(ProjectUserAdded("Usuario añadido correctamente."));
       await refreshProjects(); // Refrescar la lista de proyectos si es necesario
     } else if (addUserResponse.statusCode == 400) {

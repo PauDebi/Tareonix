@@ -13,18 +13,21 @@ class ProjectDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Project? project = ModalRoute.of(context)!.settings.arguments as Project?;
-
-    if (project == null) {
+    final Project? temp = ModalRoute.of(context)!.settings.arguments as Project?;
+  
+    if (temp == null) {
       return Scaffold(
         appBar: AppBar(title: const Text("Error")),
         body: const Center(child: Text("No se encontró el proyecto")),
       );
     }
+
+    final project_id = temp.id;
+    final project = context.read<ProjectCubit>().projects!.firstWhere((element) => element.id == project_id);
     final user = (context.read<AuthCubit>().state as AuthLoggedIn).user;
+    bool isEditable = project.leaderId == null || project.leaderId == user.id;
 
     void _showProjectDetails() {
-      bool isEditable = project.leaderId == null || project.leaderId == user.id;
 
       showDialog(
         context: context,
@@ -98,45 +101,6 @@ class ProjectDetailScreen extends StatelessWidget {
         },
       );
     }
-
-    void _showProjectMembers(BuildContext context, Project project) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Container(
-        padding: EdgeInsets.all(16),
-        height: 400,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Usuarios del Proyecto",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 12),
-            Expanded(
-              child: ListView.builder(
-                itemCount: project.members.length,
-                itemBuilder: (context, index) {
-                  final member = project.members[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: member!.profile_image != null
-                          ? NetworkImage(member.profile_image!)
-                          : AssetImage('assets/default_avatar.png') as ImageProvider,
-                    ),
-                    title: Text(member.name),
-                    subtitle: Text(member.email),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
 
 void _showAddUserDialog(BuildContext context, String projectId) {
   final TextEditingController emailController = TextEditingController();
@@ -216,13 +180,16 @@ void _showAddUserDialog(BuildContext context, String projectId) {
                 title: Text('Usuarios'),
                 leading: Icon(Icons.people),
                 children: <Widget>[
-                  ListTile(
-                    title: Text('Ver usuarios'),
-                    onTap: () {
-                      Navigator.pop(context); // Cierra el Drawer
-                      _showProjectMembers(context, project);
-                    },
-                  ),
+                  // Lista de usuarios dentro del drawer
+          ...project.members.map((member) => ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: member!.profile_image != null
+                      ? NetworkImage(member.profile_image!)
+                      : AssetImage('assets/default_avatar.png') as ImageProvider,
+                ),
+                title: Text(member.name),
+                subtitle: Text(member.email),
+                )),
                   ListTile(
                     title: Text('Añadir usuario'),
                     onTap: () {
@@ -242,6 +209,7 @@ void _showAddUserDialog(BuildContext context, String projectId) {
                   },
               ),
               // Eliminar proyecto
+              if (isEditable)
               ListTile(
                 title: Text('Eliminar proyecto'),
                 leading: Icon(Icons.delete, color: Colors.red),
