@@ -188,7 +188,6 @@ void _showAddUserDialog(BuildContext context, String projectId) {
                       : AssetImage('assets/default_avatar.png') as ImageProvider,
                 ),
                 title: Text(member.name),
-                subtitle: Text(member.email),
                 )),
                   ListTile(
                     title: Text('Añadir usuario'),
