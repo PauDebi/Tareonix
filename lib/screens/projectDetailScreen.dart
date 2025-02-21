@@ -51,7 +51,7 @@ class ProjectDetailScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('👤 Líder del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('👤 Creador del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold)),
                         SizedBox(height: 8),
                         Row(
                           children: [
@@ -100,7 +100,78 @@ class ProjectDetailScreen extends StatelessWidget {
       );
     }
 
+    void _showProjectMembers(BuildContext context, Project project) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: EdgeInsets.all(16),
+        height: 400,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Usuarios del Proyecto",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            Expanded(
+              child: ListView.builder(
+                itemCount: project.members.length,
+                itemBuilder: (context, index) {
+                  final member = project.members[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: member!.profile_image != null
+                          ? NetworkImage(member.profile_image!)
+                          : AssetImage('assets/default_avatar.png') as ImageProvider,
+                    ),
+                    title: Text(member.name),
+                    subtitle: Text(member.email),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
+void _showAddUserDialog(BuildContext context, String projectId) {
+  final TextEditingController emailController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Añadir Usuario"),
+        content: TextField(
+          controller: emailController,
+          decoration: InputDecoration(labelText: "Email del usuario"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Cerrar diálogo
+            },
+            child: Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () {
+              final email = emailController.text.trim();
+              if (email.isNotEmpty) {
+                //context.read<ProjectCubit>().addUserToProjectByEmail(projectId, email);
+              }
+              Navigator.of(context).pop(); // Cerrar diálogo
+            },
+            child: Text("Añadir", style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      );
+    },
+  );
+}
 
     return BlocProvider(
       create: (context) => TaskCubit()..fetchTasks(project),
@@ -149,15 +220,15 @@ class ProjectDetailScreen extends StatelessWidget {
                   ListTile(
                     title: Text('Ver usuarios'),
                     onTap: () {
-                      // Acción para ver los usuarios
                       Navigator.pop(context); // Cierra el Drawer
+                      _showProjectMembers(context, project);
                     },
                   ),
                   ListTile(
                     title: Text('Añadir usuario'),
                     onTap: () {
-                      // Acción para añadir usuario
                       Navigator.pop(context); // Cierra el Drawer
+                      _showAddUserDialog(context, project.id);
                     },
                   ),
                 ],
@@ -176,7 +247,7 @@ class ProjectDetailScreen extends StatelessWidget {
                 title: Text('Eliminar proyecto'),
                 leading: Icon(Icons.delete, color: Colors.red),
                 onTap: () {
-                  ProjectCubit().deleteProject(project);
+                  context.read<ProjectCubit>().deleteProject(project);
                   Navigator.pop(context); // Cierra el Drawer
                   Navigator.pop(context); // Cierra la pantalla de detalles
                 },

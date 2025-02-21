@@ -26,3 +26,12 @@ class ProjectError extends ProjectState {
   @override
   List<Object?> get props => [message];
 }
+
+class ProjectUserAdded extends ProjectState {
+  final String message;
+
+  ProjectUserAdded(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
