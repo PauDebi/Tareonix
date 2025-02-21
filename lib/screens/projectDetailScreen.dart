@@ -10,24 +10,26 @@ import 'package:taskly/widgets/Drawer.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   ProjectDetailScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final Project? temp = ModalRoute.of(context)!.settings.arguments as Project?;
-  
-    if (temp == null) {
+    final String? projectId = ModalRoute.of(context)!.settings.arguments as String?;
+
+    if (projectId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text("Error")),
         body: const Center(child: Text("No se encontró el proyecto")),
       );
     }
 
-    final project_id = temp.id;
-    final project = context.read<ProjectCubit>().projects!.firstWhere((element) => element.id == project_id);
+    final project = context.watch<ProjectCubit>().projects!.firstWhere((p) => p.id == projectId);
     final user = (context.read<AuthCubit>().state as AuthLoggedIn).user;
+    final tasksCubit = context.read<TaskCubit>();
     bool isEditable = project.leaderId == null || project.leaderId == user.id;
+
+    Future.microtask(() => tasksCubit.fetchTasks(project));
 
     void _showAddTaskDialog(BuildContext context, Project project) {
       final TextEditingController nameController = TextEditingController();
@@ -36,110 +38,92 @@ class ProjectDetailScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (dialogContext) {
-          return BlocProvider.value(
-            value: BlocProvider.of<TaskCubit>(context), // Mantiene la misma instancia de TaskCubit
-            child: AlertDialog(
-              title: Text("Añadir Tarea"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(labelText: "Nombre de la tarea"),
-                  ),
-                  TextField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(labelText: "Descripción de la tarea"),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop(); // Cerrar diálogo
-                  },
-                  child: Text("Cancelar"),
+          return AlertDialog(
+            title: Text("Añadir Tarea"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: "Nombre de la tarea"),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    final name = nameController.text.trim();
-                    final description = descriptionController.text.trim();
-                    if (name.isNotEmpty && description.isNotEmpty) {
-                      await BlocProvider.of<TaskCubit>(dialogContext)
-                          .addTask(name, description, project);
-                    }
-                    Navigator.of(dialogContext).pop(); // Cerrar diálogo
-                  },
-                  child: Text("Añadir", style: TextStyle(color: Colors.green)),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(labelText: "Descripción de la tarea"),
                 ),
               ],
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text("Cancelar"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final name = nameController.text.trim();
+                  final description = descriptionController.text.trim();
+                  if (name.isNotEmpty && description.isNotEmpty) {
+                    await context.read<TaskCubit>().addTask(name, description, project);
+                  }
+                  Navigator.of(dialogContext).pop();
+                },
+                child: Text("Añadir", style: TextStyle(color: Colors.green)),
+              ),
+            ],
           );
         },
       );
     }
 
-
-  return BlocProvider(
-    create: (context) => TaskCubit()..fetchTasks(project),
-    child: Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();  // Abrir el Drawer con la clave global
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              _showAddTaskDialog(context, project);
-            },
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
-        ],
-        title: Text(
-          project.name[0].toUpperCase() + project.name.substring(1),
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-      drawer: BlocProvider.value(
-        value: BlocProvider.of<ProjectCubit>(context),
-        child: CustomDrawer(project: project, user: user, isEditable: isEditable, context: context)
-        ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Tareas del Proyecto",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: BlocBuilder<TaskCubit, TaskState>(
-                builder: (context, state) {
-                  if (state.tasks.isEmpty) {
-                    return const Center(child: Text("No hay tareas disponibles"));
-                  }
-                  return ListView.builder(
-                    itemCount: state.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = state.tasks[index];
-                      return ListTile(
-                        title: Text(task.name),
-                        subtitle: Text(task.description),
-                      );
-                    },
-                  );
-                },
-              ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => _showAddTaskDialog(context, project),
             ),
           ],
+          title: Text(
+            project.name[0].toUpperCase() + project.name.substring(1),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
-    ),
-  );}
+        drawer: BlocProvider.value(
+          value: BlocProvider.of<ProjectCubit>(context),
+          child: CustomDrawer(
+            project: project,
+            user: user,
+            isEditable: isEditable,
+            context: context,
+          ),
+        ),
+        body: BlocBuilder<TaskCubit, TaskState>(
+          builder: (context, state) {
+            if (state is TaskLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is TaskError) {
+              return Center(child: Text("Error: ${state.error}"));
+            } else if (state is TaskLoaded) {
+              final tasks = state.tasks;
+              return ListView.builder(
+                itemCount: tasks.length,
+                itemBuilder: (context, index) {
+                  final task = tasks[index];
+                  return ListTile(
+                    title: Text(task.name),
+                    subtitle: Text(task.description)
+                  );
+                },
+              );
+            }
+            return Center(child: Text("No hay tareas disponibles"));
+          },
+        ),
+      );
+  }
 }

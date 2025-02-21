@@ -256,7 +256,7 @@ class ProjectScreen extends StatelessWidget {
                             color: Colors.grey),
                         onTap: () {
                           Navigator.of(context)
-                              .pushNamed('/projectDetails', arguments: project);
+                              .pushNamed('/projectDetails', arguments: project.id);
                         },
                       ),
                     );
