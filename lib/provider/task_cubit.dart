@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,9 +15,39 @@ class TaskCubit extends Cubit<TaskState> {
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
   final String baseUrl = "http://worldgames.es/api/tasks/";
 
-  void addTask(Task task) {
-    final updatedTasks = List<Task>.from(state.tasks)..add(task);
-    emit(TaskState(tasks: updatedTasks));
+  addTask(String name, String descriptionm, Project project) async {
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      fetchTasks(project);
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse(baseUrl + project.id.toString()), // Convertir ID a String
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization"
+        : "Bearer $token",
+      },
+      body: jsonEncode({
+        "name": name,
+        "description": descriptionm,
+      }),
+    );
+    print(response.body);
+    print(response.statusCode);
+
+    if (response.statusCode == 200) {
+      print('Tarea creada');
+      fetchTasks(project);
+      return;
+    } else if (response.statusCode == 500) {
+      print('Error en el servidor');
+      emit(TaskState(tasks: state.tasks));
+      return;
+    }
+
+    fetchTasks(project);
   }
 
   Future<void> fetchTasks(Project project) async {
@@ -35,6 +66,7 @@ class TaskCubit extends Cubit<TaskState> {
     );
 
     if (response.statusCode == 200) {
+      print('Cargo las tareas');
       final Map<String, dynamic> data = json.decode(response.body);
 
       if (data.containsKey('tasks') && data['tasks'] is List) {
@@ -43,6 +75,7 @@ class TaskCubit extends Cubit<TaskState> {
             .toList();
 
         emit(TaskState(tasks: fetchedTasks)); // Se emite el nuevo estado con las tareas
+        print('Tareas cargadas');
       } else {
         emit(TaskState(tasks: [])); // En caso de error en la estructura de datos
         throw Exception('Formato de respuesta inesperado');

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
+import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/provider/task_state.dart';
+import 'package:taskly/widgets/Drawer.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -27,233 +29,117 @@ class ProjectDetailScreen extends StatelessWidget {
     final user = (context.read<AuthCubit>().state as AuthLoggedIn).user;
     bool isEditable = project.leaderId == null || project.leaderId == user.id;
 
-    void _showProjectDetails() {
+    void _showAddTaskDialog(BuildContext context, Project project) {
+      final TextEditingController nameController = TextEditingController();
+      final TextEditingController descriptionController = TextEditingController();
 
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Detalles del Proyecto',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        builder: (dialogContext) {
+          return BlocProvider.value(
+            value: BlocProvider.of<TaskCubit>(context), // Mantiene la misma instancia de TaskCubit
+            child: AlertDialog(
+              title: Text("Añadir Tarea"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('📌 Nombre: ${project.name}', style: TextStyle(fontSize: 16)),
-                  SizedBox(height: 8),
-                  Text('📝 Descripción: ${project.description}', style: TextStyle(fontSize: 14)),
-                  SizedBox(height: 8),
-                  Text('📅 Fecha de inicio: ${project.createdAt.day.toString().padLeft(2, '0')}-'
-                      '${project.createdAt.month.toString().padLeft(2, '0')}-'
-                      '${project.createdAt.year}', style: TextStyle(fontSize: 14)),
-                  SizedBox(height: 12),
-                  if (project.leaderId != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('👤 Creador del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundImage: project.members
-                                          .firstWhere((member) => member!.id == project.leaderId)
-                                          ?.profile_image !=
-                                      null
-                                  ? NetworkImage(project.members
-                                          .firstWhere((member) => member!.id == project.leaderId)
-                                          !.profile_image!)
-                                  : AssetImage('assets/default_avatar.png') as ImageProvider,
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              project.members
-                                  .firstWhere((member) => member!.id == project.leaderId)
-                                  ?.name ?? 'Desconocido',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(labelText: "Nombre de la tarea"),
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(labelText: "Descripción de la tarea"),
+                  ),
                 ],
               ),
-            ),
-            actions: <Widget>[
-              if (isEditable)
+              actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/editProject', arguments: project);
+                    Navigator.of(dialogContext).pop(); // Cerrar diálogo
                   },
-                  child: Text('Editar', style: TextStyle(color: Colors.green)),
+                  child: Text("Cancelar"),
                 ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Cerrar', style: TextStyle(color: Colors.blue)),
-              ),
-            ],
+                TextButton(
+                  onPressed: () async {
+                    final name = nameController.text.trim();
+                    final description = descriptionController.text.trim();
+                    if (name.isNotEmpty && description.isNotEmpty) {
+                      await BlocProvider.of<TaskCubit>(dialogContext)
+                          .addTask(name, description, project);
+                    }
+                    Navigator.of(dialogContext).pop(); // Cerrar diálogo
+                  },
+                  child: Text("Añadir", style: TextStyle(color: Colors.green)),
+                ),
+              ],
+            ),
           );
         },
       );
     }
 
-void _showAddUserDialog(BuildContext context, String projectId) {
-  final TextEditingController emailController = TextEditingController();
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text("Añadir Usuario"),
-        content: TextField(
-          controller: emailController,
-          decoration: InputDecoration(labelText: "Email del usuario"),
+
+  return BlocProvider(
+    create: (context) => TaskCubit()..fetchTasks(project),
+    child: Scaffold(
+        key: _scaffoldKey,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();  // Abrir el Drawer con la clave global
+          },
         ),
         actions: [
-          TextButton(
+          IconButton(
+            icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.of(context).pop(); // Cerrar diálogo
+              _showAddTaskDialog(context, project);
             },
-            child: Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () {
-              final email = emailController.text.trim();
-              if (email.isNotEmpty) {
-                context.read<ProjectCubit>().addUserToProjectByEmail(projectId, email);
-              }
-              Navigator.of(context).pop(); // Cerrar diálogo
-            },
-            child: Text("Añadir", style: TextStyle(color: Colors.green)),
           ),
         ],
-      );
-    },
-  );
-}
-
-    return BlocProvider(
-      create: (context) => TaskCubit()..fetchTasks(project),
-      child: Scaffold(
-         key: _scaffoldKey,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();  // Abrir el Drawer con la clave global
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                // Acción para agregar tareas
-              },
-            ),
-          ],
-          title: Text(
-            project.name[0].toUpperCase() + project.name.substring(1),
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: Text(user.name),
-                accountEmail: Text(user.email),
-                currentAccountPicture: user.profile_image != null
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(user.profile_image!),
-                      )
-                    : CircleAvatar(
-                        child: Text(user.name[0].toUpperCase()),
-                ),
-              ),
-              // Usuarios
-              ExpansionTile(
-                title: Text('Usuarios'),
-                leading: Icon(Icons.people),
-                children: <Widget>[
-                  // Lista de usuarios dentro del drawer
-          ...project.members.map((member) => ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: member!.profile_image != null
-                      ? NetworkImage(member.profile_image!)
-                      : AssetImage('assets/default_avatar.png') as ImageProvider,
-                ),
-                title: Text(member.name),
-                )),
-                  ListTile(
-                    title: Text('Añadir usuario'),
-                    onTap: () {
-                      Navigator.pop(context); // Cierra el Drawer
-                      _showAddUserDialog(context, project.id);
-                    },
-                  ),
-                ],
-              ),
-              // Detalles
-              ListTile(
-                title: Text('Detalles'),
-                leading: Icon(Icons.info),
-                  onTap: () {
-                    Navigator.pop(context); // Cierra el Drawer
-                    _showProjectDetails();
-                  },
-              ),
-              // Eliminar proyecto
-              if (isEditable)
-              ListTile(
-                title: Text('Eliminar proyecto'),
-                leading: Icon(Icons.delete, color: Colors.red),
-                onTap: () {
-                  context.read<ProjectCubit>().deleteProject(project);
-                  Navigator.pop(context); // Cierra el Drawer
-                  Navigator.pop(context); // Cierra la pantalla de detalles
-                },
-              ),
-            ],
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Tareas del Proyecto",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: BlocBuilder<TaskCubit, TaskState>(
-                  builder: (context, state) {
-                    if (state.tasks.isEmpty) {
-                      return const Center(child: Text("No hay tareas disponibles"));
-                    }
-                    return ListView.builder(
-                      itemCount: state.tasks.length,
-                      itemBuilder: (context, index) {
-                        final task = state.tasks[index];
-                        return ListTile(
-                          title: Text(task.name),
-                          subtitle: Text(task.description),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+        title: Text(
+          project.name[0].toUpperCase() + project.name.substring(1),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-    );
-  }
+      drawer: BlocProvider.value(
+        value: BlocProvider.of<ProjectCubit>(context),
+        child: CustomDrawer(project: project, user: user, isEditable: isEditable, context: context)
+        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Tareas del Proyecto",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  if (state.tasks.isEmpty) {
+                    return const Center(child: Text("No hay tareas disponibles"));
+                  }
+                  return ListView.builder(
+                    itemCount: state.tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = state.tasks[index];
+                      return ListTile(
+                        title: Text(task.name),
+                        subtitle: Text(task.description),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );}
 }
