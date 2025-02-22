@@ -114,7 +114,7 @@ class Dialogs {
       );
     }
 
-    void showMemberDialog(BuildContext context, User user, bool canEdit) async {
+    void showMemberDialog(BuildContext context, User user, bool canEdit, bool showExit) async {
       final User? mainUserer = await context.read<AuthCubit>().getUser();
       showDialog(
         context: context,
@@ -162,7 +162,7 @@ class Dialogs {
             ),
             actions: [
               Column(
-                children: [ canEdit || mainUserer!.id == user.id ? 
+                children: [(canEdit || mainUserer!.id == user.id ) && showExit? 
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(
@@ -180,7 +180,7 @@ class Dialogs {
                                 fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold)),
                       
                     ),
-                  ): Placeholder(),
+                  ): SizedBox.shrink(),
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(
@@ -227,6 +227,49 @@ class Dialogs {
           ],
         );
       },
+    );
+  }
+
+  void showAssignTaskDialog(BuildContext context, Project project, Task task){
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Asignar Tarea',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: project.members.length,
+              itemBuilder: (context, index) {
+                final User user = project.members[index]!;
+                return ListTile(
+                  title: Text(user.name),
+                  leading: CircleAvatar(
+                    backgroundImage: user.profile_image != null &&
+                            user.profile_image!.isNotEmpty
+                        ? NetworkImage(user.profile_image!)
+                        : null,
+                    child: user.profile_image == null || user.profile_image!.isEmpty
+                        ? Text(user.name[0].toUpperCase(),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                        : null,
+                  ),
+                  onTap: () {
+                    context.read<TaskCubit>().assignTaskTo(user, task, project);
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      }
     );
   }
 

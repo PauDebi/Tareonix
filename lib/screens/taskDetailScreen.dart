@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/dialogs/Dialogs.dart';
-import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/project_cubit.dart';
@@ -28,7 +27,6 @@ class TaskDetailScreen extends StatelessWidget {
     if (task.assignedUserId != null) {
       user = project.members.firstWhere((u) => u!.id == task.assignedUserId);
     }
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(task.name),
@@ -40,7 +38,7 @@ class TaskDetailScreen extends StatelessWidget {
               PopupMenuItem(
                 value: 1,
                 child: Text("Aisgnar tarea"),
-                onTap: () => {}//Dialogs.showAssignTaskDialog(context, task, project),
+                onTap: () => Dialogs().showAssignTaskDialog(context, project, task),
               ),
               PopupMenuItem(
                 value: 2,
@@ -75,7 +73,7 @@ class TaskDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Description:",
+                  "Descripcion:",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 5),

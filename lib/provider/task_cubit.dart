@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
+import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/task_state.dart';
 
 class TaskCubit extends Cubit<TaskState> {
@@ -145,6 +146,37 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
+  Future<void> assignTaskTo(User user, Task task, Project project) async {
+    emit(TaskLoading());
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(TaskError("No hay token de autenticación"));
+      return;
+    }
 
+    try {
+      final response = await http.post(
+        Uri.parse(baseUrl + "asign-user-to/"+ task.id),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "user_id": user.id,
+        }),
+      );
 
+      if (response.statusCode == 200) {
+        fetchTasks(project);
+      } else {
+        emit(TaskError("Error al asignar la tarea (Código: ${response.statusCode})"));
+      }
+    } catch (e) {
+      emit(TaskError("Error de conexión: $e"));
+    }
+  }
+
+  checkToken() async{
+    
+  }
 }

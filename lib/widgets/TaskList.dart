@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/task_cubit.dart';
@@ -17,7 +18,7 @@ class TaskList extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 1.2,
+        childAspectRatio: 1.1,
       ),
       padding: const EdgeInsets.all(16),
       itemCount: tasks.length,
@@ -33,9 +34,18 @@ class TaskList extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    task.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        task.name,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: _buildAssignedUser(context, task)
+                      )
+                    ]
                   ),
                   const SizedBox(height: 8),
                   Expanded(
@@ -48,7 +58,7 @@ class TaskList extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Align(
-                    alignment: Alignment.bottomRight,
+                    alignment: Alignment.bottomLeft,
                     child: _buildStatusChip(context, task),
                   ),
                 ],
@@ -124,5 +134,32 @@ class TaskList extends StatelessWidget {
     task.status = newStatus;
     context.read<TaskCubit>().updateTask(task, project);
     Navigator.pop(context);
+  }
+
+  Widget _buildAssignedUser(BuildContext context, Task task) {
+    if (task.assignedUserId == null) {
+      return const SizedBox.shrink();
+    }
+
+    final user = project.members.firstWhere((u) => u!.id == task.assignedUserId);
+    return 
+      GestureDetector(
+        onTap: () {
+          // Handle the tap event, e.g., navigate to user profile
+          Dialogs().showMemberDialog(context, user, false, false);
+        },
+        child: user?.profile_image != null ?
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: NetworkImage(user!.profile_image!),
+          ):
+          CircleAvatar(
+            radius: 20,
+            child: Text(
+              user!.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          )
+      );
   }
 }
