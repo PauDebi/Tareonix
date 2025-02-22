@@ -86,7 +86,6 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   Future<void> updateTask(Task task, Project project) async {
-    emit(TaskLoading());
 
     final token = await secureStorage.read(key: "token");
     if (token == null) {
@@ -118,7 +117,7 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-    Future<void> deleteTask(Task task, Project project) async {
+  Future<void> deleteTask(Task task, Project project) async {
     emit(TaskLoading());
 
     final token = await secureStorage.read(key: "token");

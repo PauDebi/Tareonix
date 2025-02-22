@@ -112,7 +112,7 @@ class ProjectDetailScreen extends StatelessWidget {
               return Center(child: Text("Error: ${state.error}"));
             } else if (state is TaskLoaded) {
               final tasks = state.tasks;
-              return TaskList(tasks: tasks);
+              return TaskList(tasks: tasks, project: project);
             }
             return Center(child: Text("No hay tareas disponibles"));
           },
