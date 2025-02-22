@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/models/Project.dart';
+import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
+import 'package:taskly/provider/task_cubit.dart';
 
 class Dialogs {
   void showUserDialog(BuildContext context) {
@@ -193,5 +196,38 @@ class Dialogs {
         },
       );
     }
+
+  void showDeleteTaskDialog(BuildContext context, Task task, Project project) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Eliminar Tarea',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          content: const Text('¿Estás seguro de que deseas eliminar esta tarea?',
+              style: TextStyle(fontSize: 16)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar',
+                  style: TextStyle(fontSize: 16, color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<TaskCubit>().deleteTask(task, project);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Eliminar',
+                  style: TextStyle(fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 }

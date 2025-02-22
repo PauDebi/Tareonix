@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Project.dart';
+import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
@@ -29,7 +30,9 @@ class ProjectDetailScreen extends StatelessWidget {
     final tasksCubit = context.read<TaskCubit>();
     bool isEditable = project.leaderId == null || project.leaderId == user.id;
 
-    if (tasksCubit.state is TaskLoading){
+
+    List<Task> tasks = tasksCubit.state is TaskLoaded ? (tasksCubit.state as TaskLoaded).tasks : [];
+    if (tasks.length == 0 || tasks[0].projectId != project.id) {
       Future.microtask(() => tasksCubit.fetchTasks(project));
     }
 

@@ -112,7 +112,6 @@ class ProjectScreen extends StatelessWidget {
             } else if (state is ProjectLoaded) {
               state.projects.sort((a, b) =>
                   a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-
               return ProjectList(projects: state.projects);
             } else if (state is ProjectError) {
               return Center(child: Text(state.message));

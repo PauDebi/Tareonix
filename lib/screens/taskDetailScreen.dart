@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
@@ -32,6 +33,26 @@ class TaskDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(task.name),
         backgroundColor: Colors.blueAccent,
+        actions: [
+          PopupMenuButton<int>(
+            onSelected: (value) {},
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: Text("Aisgnar tarea"),
+                onTap: () => {}//Dialogs.showAssignTaskDialog(context, task, project),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Text("Borrar tarea"),
+                onTap: () {
+                  final dialogs = Dialogs();
+                  dialogs.showDeleteTaskDialog(context, task, project);
+                },
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,16 +87,13 @@ class TaskDetailScreen extends StatelessWidget {
                 if (user != null)
                   Row(
                     children: [
-
-                      user.profile_image != null ? 
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(user.profile_image!),
-                        )
-                      :
-                        CircleAvatar(
-                          child:Icon(Icons.person),
-                        ),
-
+                      user.profile_image != null 
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(user.profile_image!),
+                          )
+                        : CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
                       const SizedBox(width: 10),
                       Text("Assigned to: ${user.name}"),
                     ],
