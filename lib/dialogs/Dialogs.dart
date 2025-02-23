@@ -48,9 +48,9 @@ class Dialogs {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      Text(user.name,
+                        Text(user.name,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18, color: Palette.titleTextColor)),
+                            fontWeight: FontWeight.bold, fontSize: 18, color: Palette.titleTextColor)),
                       Text(user.email,
                           style: TextStyle(
                               color: Palette.textColor, fontSize: 14,)),
@@ -70,6 +70,14 @@ class Dialogs {
                   actions: [
                     Column(
                       children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            onPressed: () => showEditUserDialog(context, user),
+                            child: const Text('Cambiar datos',
+                                style: TextStyle(fontSize: 16, color: Palette.textColor)),
+                          ),
+                        ),
                         Align(
                         alignment: Alignment.center,
                         child: TextButton(
@@ -403,4 +411,58 @@ class Dialogs {
     );
   }
 
+
+  void showEditUserDialog(BuildContext context, User user) {
+    final TextEditingController nameController = TextEditingController(text: user.name);
+    final TextEditingController passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Palette.backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Editar Usuario',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: user.name, labelStyle: TextStyle(color: Colors.white) ,hintText: 'Nombre'),
+                style: const TextStyle(color: Palette.textColor),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: '', labelStyle: TextStyle(color: Colors.white), hintText: 'Contraseña'),
+                style: const TextStyle(color: Palette.textColor),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar',
+                  style: TextStyle(fontSize: 16, color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                if (!passwordController.text.isEmpty && passwordController.text.length < 8) {
+                  SnackBar(content: Text('La contraseña debe tener al menos 8 caracteres (si no desea cambiarla, déjela en blanco)'));
+                  return;
+                }
+                context.read<AuthCubit>().updateUser(nameController.text, passwordController.text, user);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Guardar',
+                  style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

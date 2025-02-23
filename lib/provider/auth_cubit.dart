@@ -219,4 +219,45 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(errorMessage: "Error de conexión"));
     }
   }
+
+  Future<void> updateUser(String name, String password, User user) async {
+    emit(AuthLoading());
+    final url = Uri.parse('http://worldgames.es/api/user');
+    final token = await getToken();
+    http.Response? response = null;
+    if (password.isEmpty) {
+      final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "name": name
+      }),
+    );
+    }
+    else {
+      final response = await http.put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "name": name,
+          "password": password,
+        }),
+      );
+    }
+
+    if (response!.statusCode == 200) {
+      user.name = name;
+      emit(AuthLoggedIn(user: user));
+    } else {
+      final responseData = jsonDecode(response.body);
+      String errorMessage = responseData['error'] ?? 'Error al verificar el email';
+      emit(AuthError(errorMessage: errorMessage));
+    }
+  }
 }

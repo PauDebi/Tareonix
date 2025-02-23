@@ -1,10 +1,10 @@
 class User {
-  final String id;
-  final DateTime createdAt;
-  final String name;
-  final String email;
-  final String? profile_image;
-  final bool isVerified;
+  String id;
+  DateTime createdAt;
+  String name;
+  String email;
+  String? profile_image;
+  bool isVerified;
 
   User({
     required this.id,
