@@ -156,7 +156,7 @@ class TaskCubit extends Cubit<TaskState> {
 
     try {
       final response = await http.post(
-        Uri.parse(baseUrl + "asign-user-to/"+ task.id),
+        Uri.parse(baseUrl + "assign-user-to/"+ task.id),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -176,7 +176,34 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  checkToken() async{
-    
+  Future<void> unassignTask(Task task, Project project) async {
+    emit(TaskLoading());
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(TaskError("No hay token de autenticación"));
+      return;
+    }
+
+    try {
+      final response = await http.delete(
+        Uri.parse(baseUrl + "unassign-user-from/"+ task.id),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "user_id": task.assignedUserId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        fetchTasks(project);
+      } else {
+        emit(TaskError("Error al desasignar la tarea (Código: ${response.statusCode}), ${response.body}"));
+      }
+    } catch (e) {
+      emit(TaskError("Error de conexión: $e"));
+    }
+
   }
 }

@@ -44,7 +44,7 @@ class CustomDrawer extends StatelessWidget {
                   : CircleAvatar(
                       child: Text(user.name[0].toUpperCase()),
               ),
-              onTap: () => Dialogs().showMemberDialog(context, member, isEditable, true),
+              onTap: () => Dialogs().showMemberDialog(context, member, isEditable, true, project, null),
               title: Text(member.name),
               )),
                 ListTile(

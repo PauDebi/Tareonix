@@ -48,6 +48,11 @@ class TaskDetailScreen extends StatelessWidget {
                   dialogs.showDeleteTaskDialog(context, task, project);
                 },
               ),
+              PopupMenuItem(
+                value: 3,
+                child: Text("Editar tarea"),
+                onTap: () => Dialogs().showEditTaskDialog(context, task, project),
+              ),
             ],
           ),
         ],

@@ -4,7 +4,9 @@ import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
+import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
+import 'package:taskly/provider/task_state.dart';
 
 class Dialogs {
   void showUserDialog(BuildContext context) {
@@ -114,7 +116,7 @@ class Dialogs {
       );
     }
 
-    void showMemberDialog(BuildContext context, User user, bool canEdit, bool showExit) async {
+    void showMemberDialog(BuildContext context, User user, bool canEdit, bool showExit, Project project ,Task? task) async {
       final User? mainUserer = await context.read<AuthCubit>().getUser();
       showDialog(
         context: context,
@@ -167,7 +169,15 @@ class Dialogs {
                     alignment: Alignment.center,
                     child: TextButton(
                       onPressed: () {
-                        //context.read<ProjectCubit>().removeMember(user.id);
+                        List<Task> tasks = context.read<TaskCubit>().state is TaskLoaded ? (context.read<TaskCubit>().state as TaskLoaded).tasks : [];
+                        if (tasks.length > 0) {
+                          for (int i = 0; i < tasks.length; i++) {
+                            if (tasks[i].assignedUserId == user.id) {
+                              context.read<TaskCubit>().unassignTask(tasks[i], project);
+                            }
+                          }
+                        }
+                        context.read<ProjectCubit>().removeMember(user, project, context);
                         Navigator.of(context).pop();
                       },
                       child: mainUserer!.id == user.id ?
@@ -180,7 +190,17 @@ class Dialogs {
                                 fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold)),
                       
                     ),
-                  ): SizedBox.shrink(),
+                  ): 
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: () { 
+                        context.read<TaskCubit>().unassignTask(task!, project);
+                        },
+                      child: const Text('Desasingar usuario',
+                          style: TextStyle(fontSize: 16, color: Colors.blue)),
+                    ),
+                  ),
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(
@@ -268,6 +288,54 @@ class Dialogs {
               },
             ),
           ),
+        );
+      }
+    );
+  }
+
+  void showEditTaskDialog(BuildContext context, Task task, Project project){
+    final TextEditingController nameController = TextEditingController(text: task.name);
+    final TextEditingController descriptionController = TextEditingController(text: task.description);
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Editar Tarea',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre de la tarea'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción de la tarea'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar',
+                  style: TextStyle(fontSize: 16, color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                task.name = nameController.text;
+                task.description = descriptionController.text;
+                context.read<TaskCubit>().updateTask(task, project);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Guardar',
+                  style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+            ),
+          ],
         );
       }
     );

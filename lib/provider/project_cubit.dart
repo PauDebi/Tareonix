@@ -1,9 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:taskly/models/Project.dart';
+import 'package:taskly/models/Task.dart';
+import 'package:taskly/models/User.dart';
+import 'package:taskly/provider/task_cubit.dart';
+import 'package:taskly/provider/task_state.dart';
 
 part 'project_state.dart';
 
@@ -164,9 +170,6 @@ class ProjectCubit extends Cubit<ProjectState> {
         },
         body: jsonEncode({"user_email": email}),
       );
-      print("termina la solicitud");
-      print(addUserResponse.statusCode);
-      print(addUserResponse.body);
 
       if (addUserResponse.statusCode == 201) {
         print('Usuario añadido correctamente.');
@@ -184,4 +187,43 @@ class ProjectCubit extends Cubit<ProjectState> {
       emit(ProjectError("Error al procesar la solicitud."));
     }
   }
+
+  void removeMember(User user, Project project, BuildContext context) async {
+    final taskState = context.read<TaskCubit>();
+    final List<Task> tasks = taskState is TaskLoaded ? taskState.state.tasks : [];
+    if (!tasks.isEmpty) {
+      for (Task task in tasks) {
+        if (task.assignedUserId != null) {
+          
+        }
+      }
+    }
+    emit(ProjectLoading());
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      emit(ProjectError("No se encontró un token de autenticación."));
+      return;
+    }
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/${project.id}/remove-user"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({"user_email": user.email}),
+    );
+
+    if (response.statusCode == 200) {
+      print('Usuario eliminado correctamente.');
+      await loadProjects();
+    } else if (response.statusCode == 403) {
+      emit(ProjectError("No tienes permisos para eliminar usuarios de este proyecto."));
+    } else {
+      emit(ProjectError("Error al eliminar el usuario del proyecto."));
+    }
+  }
+    
+
+
 }

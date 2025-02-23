@@ -56,4 +56,15 @@ class User {
       isVerified: isVerified ?? this.isVerified
     );
   }
+
+  User nullUser() {
+    return User(
+      id: '',
+      createdAt: DateTime.now(),
+      name: '',
+      email: '',
+      profile_image: '',
+      isVerified: false
+    );
+  }
 }

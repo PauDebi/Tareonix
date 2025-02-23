@@ -35,6 +35,7 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
   }
 
   Future<void> _updateProject() async {
+    
     final token = await secureStorage.read(key: "token");
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(

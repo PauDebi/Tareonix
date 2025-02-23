@@ -56,7 +56,7 @@ class TaskList extends StatelessWidget {
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: _buildStatusChip(context, task),
@@ -146,7 +146,7 @@ class TaskList extends StatelessWidget {
       GestureDetector(
         onTap: () {
           // Handle the tap event, e.g., navigate to user profile
-          Dialogs().showMemberDialog(context, user, false, false);
+          Dialogs().showMemberDialog(context, user, false, false, project ,task);
         },
         child: user?.profile_image != null ?
           CircleAvatar(
