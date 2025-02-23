@@ -223,7 +223,40 @@ class ProjectCubit extends Cubit<ProjectState> {
       emit(ProjectError("Error al eliminar el usuario del proyecto."));
     }
   }
-    
 
+    Future<void> updateProject(BuildContext context, Project project) async {
+    
+    final token = await secureStorage.read(key: "token");
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: No se encontró el token de autenticación")),
+      );
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse("http://worldgames.es/api/projects/${project.id}"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "name": project.name,
+        "description": project.description,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Proyecto actualizado exitosamente")),
+      );
+      await loadProjects();
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al actualizar el proyecto")),
+      );
+    }
+  }
 
 }

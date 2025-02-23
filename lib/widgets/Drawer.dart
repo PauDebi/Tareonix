@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/Palette.dart';
 import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/User.dart';
@@ -16,6 +17,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(context) {
     return Drawer(
+        backgroundColor: Palette.backgroundColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
@@ -29,10 +31,13 @@ class CustomDrawer extends StatelessWidget {
                   : CircleAvatar(
                       child: Text(user.name[0].toUpperCase()),
               ),
+              decoration: BoxDecoration(
+                color: Palette.cardColor, // Cambia este color según tus necesidades
+              ),
             ),
             // Usuarios
             ExpansionTile(
-              title: Text('Usuarios'),
+              title: Text('Usuarios', style: TextStyle(color: Palette.titleTextColor)),
               leading: Icon(Icons.people),
               children: <Widget>[
                 // Lista de usuarios dentro del drawer
@@ -45,10 +50,11 @@ class CustomDrawer extends StatelessWidget {
                       child: Text(user.name[0].toUpperCase()),
               ),
               onTap: () => Dialogs().showMemberDialog(context, member, isEditable, true, project, null),
-              title: Text(member.name),
+              title: Text(member.name, style: TextStyle(color: Palette.textColor)),
               )),
                 ListTile(
-                  title: Text('Añadir usuario'),
+                  leading: Icon(Icons.add, color: Palette.iconColor),
+                  title: Text('Añadir usuario', style: TextStyle(color: Palette.textColor)),
                   onTap: () {
                     Navigator.pop(context); // Cierra el Drawer
                     _showAddUserDialog(context, project.id);
@@ -58,7 +64,7 @@ class CustomDrawer extends StatelessWidget {
             ),
             // Detalles
             ListTile(
-              title: Text('Detalles'),
+              title: Text('Detalles', style: TextStyle(color: Palette.titleTextColor)),
               leading: Icon(Icons.info),
                 onTap: () {
                   Navigator.pop(context); // Cierra el Drawer
@@ -68,7 +74,7 @@ class CustomDrawer extends StatelessWidget {
             // Eliminar proyecto
             if (isEditable)
             ListTile(
-              title: Text('Eliminar proyecto'),
+              title: Text('Eliminar proyecto', style: TextStyle(color: Palette.titleTextColor)),
               leading: Icon(Icons.delete, color: Colors.red),
               onTap: () {
                 context.read<ProjectCubit>().deleteProject(project);
@@ -87,10 +93,12 @@ class CustomDrawer extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Añadir Usuario"),
+          backgroundColor: Palette.backgroundColor,
+          title: Text("Añadir Usuario", style: TextStyle(color: Palette.textColor)),
           content: TextField(
             controller: emailController,
-            decoration: InputDecoration(labelText: "Email del usuario"),
+            decoration: InputDecoration(labelText: "Email del usuario", labelStyle: TextStyle(color: Palette.textColor)),
+            style: TextStyle(color: Palette.textColor),
           ),
           actions: [
             TextButton(
@@ -120,27 +128,28 @@ class CustomDrawer extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Palette.backgroundColor,
             title: Text(
               'Detalles del Proyecto',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Palette.textColor),
             ),
             content: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('📌 Nombre: ${project.name}', style: TextStyle(fontSize: 16)),
+                  Text('📌 Nombre: ${project.name}', style: TextStyle(fontSize: 16, color: Palette.textColor)),
                   SizedBox(height: 8),
-                  Text('📝 Descripción: ${project.description}', style: TextStyle(fontSize: 14)),
+                  Text('📝 Descripción: ${project.description}', style: TextStyle(fontSize: 14, color: Palette.textColor)),
                   SizedBox(height: 8),
                   Text('📅 Fecha de inicio: ${project.createdAt.day.toString().padLeft(2, '0')}-'
                       '${project.createdAt.month.toString().padLeft(2, '0')}-'
-                      '${project.createdAt.year}', style: TextStyle(fontSize: 14)),
+                      '${project.createdAt.year}', style: TextStyle(fontSize: 14, color: Palette.textColor)),
                   SizedBox(height: 12),
                   if (project.leaderId != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('👤 Creador del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('👤 Creador del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold, color: Palette.textColor)),
                         SizedBox(height: 8),
                         Row(
                           children: [
@@ -160,7 +169,7 @@ class CustomDrawer extends StatelessWidget {
                               project.members
                                   .firstWhere((member) => member!.id == project.leaderId)
                                   ?.name ?? 'Desconocido',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16, color: Palette.textColor),
                             ),
                           ],
                         ),
@@ -173,7 +182,8 @@ class CustomDrawer extends StatelessWidget {
               if (isEditable)
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/editProject', arguments: project);
+                    Navigator.of(context).pop();
+                    Dialogs().showEditProjectDialog(context, project);
                   },
                   child: Text('Editar', style: TextStyle(color: Colors.green)),
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/Palette.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/provider/auth_cubit.dart';
@@ -44,17 +45,20 @@ class ProjectDetailScreen extends StatelessWidget {
         context: context,
         builder: (dialogContext) {
           return AlertDialog(
-            title: Text("Añadir Tarea"),
+            backgroundColor: Palette.backgroundColor,
+            title: Text("Añadir Tarea", style: TextStyle(color: Palette.textColor)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: InputDecoration(labelText: "Nombre de la tarea"),
+                  decoration: InputDecoration(labelText: "Nombre de la tarea", labelStyle: TextStyle(color: Palette.textColor)),
+                  style: TextStyle(color: Palette.textColor),
                 ),
                 TextField(
                   controller: descriptionController,
-                  decoration: InputDecoration(labelText: "Descripción de la tarea"),
+                  decoration: InputDecoration(labelText: "Descripción de la tarea", labelStyle: TextStyle(color: Palette.textColor)),
+                  style: TextStyle(color: Palette.textColor)
                 ),
               ],
             ),
@@ -83,19 +87,22 @@ class ProjectDetailScreen extends StatelessWidget {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
+          backgroundColor: Palette.appBarColor,
           leading: IconButton(
             icon: Icon(Icons.menu),
+            color: Palette.iconColor,
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
           actions: [
             IconButton(
               icon: Icon(Icons.add),
+              color: Palette.iconColor,
               onPressed: () => _showAddTaskDialog(context, project),
             ),
           ],
           title: Text(
             project.name[0].toUpperCase() + project.name.substring(1),
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Palette.titleTextColor),
           ),
         ),
         drawer: BlocProvider.value(
@@ -110,7 +117,10 @@ class ProjectDetailScreen extends StatelessWidget {
         body: BlocBuilder<TaskCubit, TaskState>(
           builder: (context, state) {
             if (state is TaskLoading) {
-              return Center(child: CircularProgressIndicator());
+              return Container(
+                color: Palette.backgroundColor,
+                child: Center(),
+              );
             } else if (state is TaskError) {
               return Center(child: Text("Error: ${state.error}"));
             } else if (state is TaskLoaded) {

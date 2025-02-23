@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
@@ -8,7 +7,6 @@ import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
 import 'package:taskly/screens/SignUp_SignIn/singInScreen.dart';
 import 'package:taskly/screens/SignUp_SignIn/singUpScreen.dart';
-import 'package:taskly/screens/Project_Screens/editProjectScreen.dart';
 import 'package:taskly/screens/homeScreen.dart';
 import 'package:taskly/screens/Project_Screens/projectDetailScreen.dart';
 import 'package:taskly/screens/Project_Screens/projectScreen.dart';
@@ -60,7 +58,6 @@ class MyApp extends StatelessWidget {
             '/home': (context) => HomeScreen(),
             '/project': (context) => ProjectScreen(),
             '/projectDetails': (context) => ProjectDetailScreen(),
-            '/editProject': (context) => EditProjectScreen(project: ModalRoute.of(context)!.settings.arguments as Project),
             '/taskDetails': (context) => TaskDetailScreen(task: ModalRoute.of(context)!.settings.arguments as Task,),
           },
         );

@@ -1,12 +1,12 @@
 import 'package:taskly/models/User.dart';
 
 class Project {
-  final String id;
-  final String name;
-  final String description;
-  final String? leaderId; // Puede ser nulo si no hay líder
-  final DateTime createdAt;
-  final List<User?> members;
+  String id;
+  String name;
+  String description;
+  String? leaderId; // Puede ser nulo si no hay líder
+  DateTime createdAt;
+  List<User?> members;
 
   Project({
     required this.id,

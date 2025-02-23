@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/Palette.dart';
 import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/project_cubit.dart';
@@ -58,7 +59,8 @@ class ProjectScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Trello's Competency"),
+        title: const Text("Proyectos", style: TextStyle(color: Colors.white)),
+        backgroundColor: Palette.appBarColor,
         actions: [
           BlocBuilder<AuthCubit, AuthState>(
             builder: (context, authState) {
@@ -108,7 +110,9 @@ class ProjectScreen extends StatelessWidget {
         child: BlocBuilder<ProjectCubit, ProjectState>(
           builder: (context, state) {
             if (state is ProjectLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Container(
+                color: Palette.backgroundColor,
+              );
             } else if (state is ProjectLoaded) {
               state.projects.sort((a, b) =>
                   a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -124,6 +128,7 @@ class ProjectScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddProjectDialog(context),
         child: const Icon(Icons.add),
+        backgroundColor: Colors.black38,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/Palette.dart';
 import 'package:taskly/dialogs/Dialogs.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
@@ -13,60 +14,66 @@ class TaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.1,
-      ),
-      padding: const EdgeInsets.all(16),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 4,
-          child: InkWell(
-            onTap: () => Navigator.pushNamed(context, '/taskDetails', arguments: task),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      color: Palette.backgroundColor,
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 1.1,
+        ),
+        padding: const EdgeInsets.all(16),
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          final task = tasks[index];
+          return FadeInWidget(
+            child: Card(
+              color: Palette.cardColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 4,
+              child: InkWell(
+                onTap: () => Navigator.pushNamed(context, '/taskDetails', arguments: task),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        task.name,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            task.name,
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Palette.titleTextColor),
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: _buildAssignedUser(context, task),
+                          )
+                        ]
                       ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Text(
+                          task.description,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Palette.textColor, fontSize: 14),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Align(
-                        alignment: Alignment.topRight,
-                        child: _buildAssignedUser(context, task)
-                      )
-                    ]
+                        alignment: Alignment.bottomLeft,
+                        child: _buildStatusChip(context, task),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Text(
-                      task.description,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: _buildStatusChip(context, task),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -107,20 +114,21 @@ class TaskList extends StatelessWidget {
       context: context,
       builder: (context) {
         return Container(
+          color: Palette.backgroundColor,
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('Pendiente'),
+                title: Text('Pendiente', style: TextStyle(color: task.status == 'TO_DO' ? Colors.grey : Palette.textColor)),
                 onTap: () => _updateTaskStatus(context, task, 'TO_DO'),
               ),
               ListTile(
-                title: Text('En Progreso'),
+                title: Text('En Progreso', style: TextStyle(color: task.status == 'IN_PROGRESS' ? Colors.orange : Palette.textColor)),
                 onTap: () => _updateTaskStatus(context, task, 'IN_PROGRESS'),
               ),
               ListTile(
-                title: Text('Completado'),
+                title: Text('Completado', style: TextStyle(color: task.status == 'DONE' ? Colors.green : Palette.textColor)),
                 onTap: () => _updateTaskStatus(context, task, 'DONE'),
               ),
             ],
@@ -142,24 +150,60 @@ class TaskList extends StatelessWidget {
     }
 
     final user = project.members.firstWhere((u) => u!.id == task.assignedUserId);
-    return 
-      GestureDetector(
-        onTap: () {
-          // Handle the tap event, e.g., navigate to user profile
-          Dialogs().showMemberDialog(context, user, false, false, project ,task);
-        },
-        child: user?.profile_image != null ?
-          CircleAvatar(
-            radius: 20,
-            backgroundImage: NetworkImage(user!.profile_image!),
-          ):
-          CircleAvatar(
-            radius: 20,
-            child: Text(
-              user!.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: () {
+        Dialogs().showMemberDialog(context, user, false, false, project, task);
+      },
+      child: user?.profile_image != null
+          ? CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(user!.profile_image!),
+            )
+          : CircleAvatar(
+              radius: 20,
+              child: Text(
+                user!.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          )
-      );
+    );
+  }
+}
+
+class FadeInWidget extends StatefulWidget {
+  final Widget child;
+  const FadeInWidget({Key? key, required this.child}) : super(key: key);
+
+  @override
+  _FadeInWidgetState createState() => _FadeInWidgetState();
+}
+
+class _FadeInWidgetState extends State<FadeInWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: widget.child,
+    );
   }
 }

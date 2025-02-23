@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskly/Palette.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
@@ -20,12 +21,13 @@ class Dialogs {
               } else if (authState is AuthLoggedIn) {
                 final user = authState.user;
                 return AlertDialog(
+                  backgroundColor: Palette.backgroundColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                   title: const Center(
                     child: Text('Perfil de Usuario',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.titleTextColor)),
                   ),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -48,19 +50,20 @@ class Dialogs {
                       const SizedBox(height: 15),
                       Text(user.name,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18)),
+                              fontWeight: FontWeight.bold, fontSize: 18, color: Palette.titleTextColor)),
                       Text(user.email,
                           style: TextStyle(
-                              color: Colors.grey[600], fontSize: 14)),
+                              color: Palette.textColor, fontSize: 14,)),
                       const SizedBox(height: 10),
                       Text("Fecha de Creación:",
                           style: const TextStyle(
+                            color: Palette.textColor,
                               fontWeight: FontWeight.bold, fontSize: 14)),
                       Text(
                         "${user.createdAt.day.toString().padLeft(2, '0')}-"
                         "${user.createdAt.month.toString().padLeft(2, '0')}-"
                         "${user.createdAt.year}",
-                        style: TextStyle(color: Colors.grey[700]),
+                        style: TextStyle(color: Palette.textColor),
                       ),
                     ],
                   ),
@@ -84,7 +87,7 @@ class Dialogs {
                           child: TextButton(
                             onPressed: () => Navigator.of(context).pop(),
                             child: const Text('Cerrar',
-                                style: TextStyle(fontSize: 16, color: Colors.blue)),
+                                style: TextStyle(fontSize: 16, color: Palette.textColor)),
                           ),
                         ),
                       ]
@@ -93,18 +96,19 @@ class Dialogs {
                 );
               } else if (authState is AuthError) {
                 return AlertDialog(
+                  backgroundColor: Palette.backgroundColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                   title: const Text('Error',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
                   content: Text(authState.errorMessage,
                       style: const TextStyle(fontSize: 16)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cerrar',
-                          style: TextStyle(fontSize: 16, color: Colors.blue)),
+                          style: TextStyle(fontSize: 16, color: Palette.textColor)),
                     ),
                   ],
                 );
@@ -122,12 +126,13 @@ class Dialogs {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Palette.backgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             title: const Center(
               child: Text('Perfil de Usuario',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.titleTextColor)),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -146,19 +151,19 @@ class Dialogs {
                 const SizedBox(height: 15),
                 Text(user.name,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18)),
+                        fontWeight: FontWeight.bold, fontSize: 18, color: Palette.titleTextColor)),
                 Text(user.email,
                     style: TextStyle(
-                        color: Colors.grey[600], fontSize: 14)),
+                        color: Palette.textColor, fontSize: 14)),
                 const SizedBox(height: 10),
                 Text("Fecha de Creación:",
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
+                        fontWeight: FontWeight.bold, fontSize: 14, color: Palette.titleTextColor)),
                 Text(
                   "${user.createdAt.day.toString().padLeft(2, '0')}-"
                   "${user.createdAt.month.toString().padLeft(2, '0')}-"
                   "${user.createdAt.year}",
-                  style: TextStyle(color: Colors.grey[700]),
+                  style: TextStyle(color: Palette.textColor),
                 ),
               ],
             ),
@@ -196,9 +201,10 @@ class Dialogs {
                     child: TextButton(
                       onPressed: () { 
                         context.read<TaskCubit>().unassignTask(task!, project);
+                        Navigator.of(context).pop();
                         },
                       child: const Text('Desasingar usuario',
-                          style: TextStyle(fontSize: 16, color: Colors.blue)),
+                          style: TextStyle(fontSize: 16, color: Palette.textColor)),
                     ),
                   ),
                   Align(
@@ -206,7 +212,7 @@ class Dialogs {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cerrar',
-                          style: TextStyle(fontSize: 16, color: Colors.blue)),
+                          style: TextStyle(fontSize: 16, color: Palette.textColor)),
                     ),
                   ),
                 ]
@@ -222,18 +228,19 @@ class Dialogs {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Palette.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text('Eliminar Tarea',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
           content: const Text('¿Estás seguro de que deseas eliminar esta tarea?',
-              style: TextStyle(fontSize: 16)),
+              style: TextStyle(fontSize: 16, color: Palette.textColor)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancelar',
-                  style: TextStyle(fontSize: 16, color: Colors.blue)),
+                  style: TextStyle(fontSize: 16, color: Palette.textColor)),
             ),
             TextButton(
               onPressed: () {
@@ -255,11 +262,12 @@ class Dialogs {
       context: context, 
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Palette.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text('Asignar Tarea',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
           content: Container(
             width: double.maxFinite,
             child: ListView.builder(
@@ -268,7 +276,7 @@ class Dialogs {
               itemBuilder: (context, index) {
                 final User user = project.members[index]!;
                 return ListTile(
-                  title: Text(user.name),
+                  title: Text(user.name, style: TextStyle(color: Palette.textColor)),
                   leading: CircleAvatar(
                     backgroundImage: user.profile_image != null &&
                             user.profile_image!.isNotEmpty
@@ -276,7 +284,7 @@ class Dialogs {
                         : null,
                     child: user.profile_image == null || user.profile_image!.isEmpty
                         ? Text(user.name[0].toUpperCase(),
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Palette.textColor))
                         : null,
                   ),
                   onTap: () {
@@ -300,22 +308,25 @@ class Dialogs {
       context: context, 
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Palette.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text('Editar Tarea',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nombre de la tarea'),
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Nombre de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Palette.textColor),
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción de la tarea'),
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: 'Descripción de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Palette.textColor),
               ),
             ],
           ),
@@ -330,6 +341,57 @@ class Dialogs {
                 task.name = nameController.text;
                 task.description = descriptionController.text;
                 context.read<TaskCubit>().updateTask(task, project);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Guardar',
+                  style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+  void showEditProjectDialog(BuildContext context, Project project){
+    final TextEditingController nameController = TextEditingController(text: project.name);
+    final TextEditingController descriptionController = TextEditingController(text: project.description);
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Palette.backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Editar Tarea',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Nombre de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Palette.textColor),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: 'Descripción de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Palette.textColor),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar',
+                  style: TextStyle(fontSize: 16, color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                project.name = nameController.text;
+                project.description = descriptionController.text;
+                context.read<ProjectCubit>().updateProject(context, project);
                 Navigator.of(context).pop();
               },
               child: const Text('Guardar',
