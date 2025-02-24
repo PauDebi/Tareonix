@@ -14,65 +14,82 @@ class TaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Palette.backgroundColor,
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 1.1,
-        ),
-        padding: const EdgeInsets.all(16),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return FadeInWidget(
-            child: Card(
-              color: Palette.cardColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
-              child: InkWell(
-                onTap: () => Navigator.pushNamed(context, '/taskDetails', arguments: task),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            task.name,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Palette.titleTextColor),
-                          ),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: _buildAssignedUser(context, task),
-                          )
-                        ]
-                      ),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: Text(
-                          task.description,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Palette.textColor, fontSize: 14),
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<TaskCubit>().fetchTasks(project);
+      },
+      child: Container(
+        color: Palette.backgroundColor,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 1,
+          ),
+          padding: const EdgeInsets.all(16),
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            return FadeInWidget(
+              child: Card(
+                color: Palette.cardColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+                child: InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/taskDetails', arguments: task),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded( // Evita overflow del título
+                              child: Text(
+                                task.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Palette.titleTextColor,
+                                ),
+                                overflow: TextOverflow.ellipsis, // Recorta si es muy largo
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: _buildAssignedUser(context, task),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: _buildStatusChip(context, task),
-                      ),
-                    ],
+      
+                        const SizedBox(height: 8),
+      
+                        Flexible( // Evita overflow de la descripción
+                          child: Text(
+                            task.description,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Palette.textColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: _buildStatusChip(context, task),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -146,7 +163,10 @@ class TaskList extends StatelessWidget {
 
   Widget _buildAssignedUser(BuildContext context, Task task) {
     if (task.assignedUserId == null) {
-      return const SizedBox.shrink();
+      return CircleAvatar(
+        radius: 20,
+        backgroundColor: Palette.cardColor,
+      );
     }
 
     final user = project.members.firstWhere((u) => u!.id == task.assignedUserId);

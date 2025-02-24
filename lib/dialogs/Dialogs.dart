@@ -129,7 +129,7 @@ class Dialogs {
     }
 
     void showMemberDialog(BuildContext context, User user, bool canEdit, bool showExit, Project project ,Task? task) async {
-      final User? mainUserer = await context.read<AuthCubit>().getUser();
+      final User? mainUser = await context.read<AuthCubit>().getUser();
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -177,7 +177,8 @@ class Dialogs {
             ),
             actions: [
               Column(
-                children: [(canEdit || mainUserer!.id == user.id ) && showExit? 
+                children: [ 
+                  (mainUser!.id == user.id && mainUser.id != project.leaderId) && showExit ?
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(
@@ -191,19 +192,35 @@ class Dialogs {
                           }
                         }
                         context.read<ProjectCubit>().removeMember(user, project, context);
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamedAndRemoveUntil('/project' , (route) => false);
                       },
-                      child: mainUserer!.id == user.id ?
+                      child:
                         const Text('Salir del proyecto',
                             style: TextStyle(
                                 fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold))
-                      :
-                        const Text('Eliminar del proyecto',
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold)),
-                      
                     ),
-                  ): 
+                  ): (user.id != mainUser.id && canEdit)?Align(
+                    alignment: Alignment.center,
+                    child: 
+                    TextButton(
+                      onPressed: (){
+                        List<Task> tasks = context.read<TaskCubit>().state is TaskLoaded ? (context.read<TaskCubit>().state as TaskLoaded).tasks : [];
+                        if (tasks.length > 0) {
+                          for (int i = 0; i < tasks.length; i++) {
+                            if (tasks[i].assignedUserId == user.id) {
+                              context.read<TaskCubit>().unassignTask(tasks[i], project);
+                            }
+                          }
+                        }
+                        context.read<ProjectCubit>().removeMember(user, project, context);
+                        Navigator.of(context).pushNamedAndRemoveUntil('/project' , (route) => false);
+                      }, 
+                      child:   
+                        const Text('Eliminar del proyecto',
+                          style: TextStyle(
+                            fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold)),),
+                  ): const SizedBox.shrink(),
+                  showExit ? const SizedBox.shrink() :
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(

@@ -226,7 +226,7 @@ class AuthCubit extends Cubit<AuthState> {
     final token = await getToken();
     http.Response? response = null;
     if (password.isEmpty) {
-      final response = await http.put(
+      response = await http.put(
       url,
       headers: {
         "Content-Type": "application/json",
@@ -238,7 +238,7 @@ class AuthCubit extends Cubit<AuthState> {
     );
     }
     else {
-      final response = await http.put(
+      response = await http.put(
         url,
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +251,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
     }
 
-    if (response!.statusCode == 200) {
+    if (response.statusCode == 200) {
       user.name = name;
       emit(AuthLoggedIn(user: user));
     } else {
