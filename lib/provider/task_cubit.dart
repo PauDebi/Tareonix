@@ -14,7 +14,8 @@ class TaskCubit extends Cubit<TaskState> {
   final String baseUrl = "http://worldgames.es/api/tasks/";
 
   // Función para agregar una tarea
-  Future<void> addTask(String name, String description, Project project) async {
+  Future<void> addTask(String name, String? description, Project project) async {
+    description ??= "";
     emit(TaskLoading());
 
     final token = await secureStorage.read(key: "token");

@@ -63,7 +63,6 @@ class TaskList extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.bottomLeft,
                           child: _buildStatusChip(context, task),

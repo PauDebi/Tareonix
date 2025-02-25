@@ -80,7 +80,7 @@ class ProjectDetailScreen extends StatelessWidget {
                 onPressed: () async {
                   final name = nameController.text.trim();
                   final description = descriptionController.text.trim();
-                  if (name.isNotEmpty && description.isNotEmpty) {
+                  if (name.isNotEmpty) {
                     await context.read<TaskCubit>().addTask(name, description, project);
                   }
                   Navigator.of(dialogContext).pop();
