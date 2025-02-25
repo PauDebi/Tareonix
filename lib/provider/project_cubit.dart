@@ -5,11 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:taskly/models/Project.dart';
-import 'package:taskly/models/Task.dart';
-import 'package:taskly/models/User.dart';
-import 'package:taskly/provider/task_cubit.dart';
-import 'package:taskly/provider/task_state.dart';
+import 'package:Tareonix/models/Project.dart';
+import 'package:Tareonix/models/Task.dart';
+import 'package:Tareonix/models/User.dart';
+import 'package:Tareonix/provider/task_cubit.dart';
+import 'package:Tareonix/provider/task_state.dart';
 
 part 'project_state.dart';
 

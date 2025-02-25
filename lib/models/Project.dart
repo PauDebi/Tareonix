@@ -1,4 +1,4 @@
-import 'package:taskly/models/User.dart';
+import 'package:Tareonix/models/User.dart';
 
 class Project {
   String id;

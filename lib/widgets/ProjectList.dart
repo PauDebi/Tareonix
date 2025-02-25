@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskly/Palette.dart';
-import 'package:taskly/models/Project.dart';
-import 'package:taskly/provider/project_cubit.dart';
+import 'package:Tareonix/Palette.dart';
+import 'package:Tareonix/models/Project.dart';
+import 'package:Tareonix/provider/project_cubit.dart';
 
 class ProjectList extends StatelessWidget {
   final List<Project> projects;

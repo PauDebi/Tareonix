@@ -1,7 +1,8 @@
+import 'package:Tareonix/Palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskly/provider/auth_cubit.dart';
-import 'package:taskly/widgets/TextField.dart';
+import 'package:Tareonix/provider/auth_cubit.dart';
+import 'package:Tareonix/widgets/TextField.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -13,7 +14,12 @@ class SignUpScreen extends StatelessWidget {
     final TextEditingController passwordController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Registrarse")),
+      backgroundColor: Palette.backgroundColor,
+      appBar: AppBar(
+        title: const Text("Registrarse", style: TextStyle(color: Palette.titleTextColor)),
+        backgroundColor: Palette.appBarColor,
+        iconTheme: const IconThemeData(color: Palette.iconColor),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -37,7 +43,15 @@ class SignUpScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async{
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                backgroundColor: Palette.cardColor,
+                foregroundColor: Palette.textColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              onPressed: () async {
                 final String name = nameController.text.trim();
                 final String email = emailController.text.trim();
                 final String password = passwordController.text.trim();
@@ -47,15 +61,17 @@ class SignUpScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Usuario registrado correctamente, se ha enviado un correo de verificación')),
                   );
-                    Navigator.of(context).pushReplacementNamed('/login');
-                }
-                else {
+                  Navigator.of(context).pushReplacementNamed('/login');
+                } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Por favor, rellene todos los campos')),
                   );
                 }
               },
-              child: const Text('Registrarse'),
+              child: const Text(
+                'Registrarse',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskly/Palette.dart';
-import 'package:taskly/dialogs/Dialogs.dart';
-import 'package:taskly/models/User.dart';
-import 'package:taskly/provider/project_cubit.dart';
-import 'package:taskly/provider/auth_cubit.dart';
-import 'package:taskly/widgets/ProjectList.dart';
+import 'package:Tareonix/Palette.dart';
+import 'package:Tareonix/dialogs/Dialogs.dart';
+import 'package:Tareonix/models/User.dart';
+import 'package:Tareonix/provider/project_cubit.dart';
+import 'package:Tareonix/provider/auth_cubit.dart';
+import 'package:Tareonix/widgets/ProjectList.dart';
 
 class ProjectScreen extends StatelessWidget {
   void _showAddProjectDialog(BuildContext context) {

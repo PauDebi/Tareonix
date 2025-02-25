@@ -1,17 +1,17 @@
+import 'package:Tareonix/models/Task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskly/models/Task.dart';
-import 'package:taskly/models/User.dart';
-import 'package:taskly/provider/auth_cubit.dart';
-import 'package:taskly/provider/project_cubit.dart';
-import 'package:taskly/provider/task_cubit.dart';
-import 'package:taskly/screens/SignUp_SignIn/singInScreen.dart';
-import 'package:taskly/screens/SignUp_SignIn/singUpScreen.dart';
-import 'package:taskly/screens/homeScreen.dart';
-import 'package:taskly/screens/Project_Screens/projectDetailScreen.dart';
-import 'package:taskly/screens/Project_Screens/projectScreen.dart';
-import 'package:taskly/screens/taskDetailScreen.dart';
+import 'package:Tareonix/models/User.dart';
+import 'package:Tareonix/provider/auth_cubit.dart';
+import 'package:Tareonix/provider/project_cubit.dart';
+import 'package:Tareonix/provider/task_cubit.dart';
+import 'package:Tareonix/screens/SignUp_SignIn/singInScreen.dart';
+import 'package:Tareonix/screens/SignUp_SignIn/singUpScreen.dart';
+import 'package:Tareonix/screens/homeScreen.dart';
+import 'package:Tareonix/screens/Project_Screens/projectDetailScreen.dart';
+import 'package:Tareonix/screens/Project_Screens/projectScreen.dart';
+import 'package:Tareonix/screens/taskDetailScreen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Taskly App',
+          title: 'Tareonix App',
           home: Stack(
             children: [
               if (snapshot.connectionState == ConnectionState.waiting)

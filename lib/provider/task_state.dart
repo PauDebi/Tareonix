@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:taskly/models/Task.dart';
+import 'package:Tareonix/models/Task.dart';
 
 class TaskState extends Equatable {
   final List<Task> tasks;
