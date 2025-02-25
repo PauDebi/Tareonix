@@ -25,7 +25,7 @@ class TaskList extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
-            childAspectRatio: 1,
+            childAspectRatio: 1.25,
           ),
           padding: const EdgeInsets.all(16),
           itemCount: tasks.length,
@@ -62,20 +62,6 @@ class TaskList extends StatelessWidget {
                               child: _buildAssignedUser(context, task),
                             ),
                           ],
-                        ),
-      
-                        const SizedBox(height: 8),
-      
-                        Flexible( // Evita overflow de la descripción
-                          child: Text(
-                            task.description,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Palette.textColor,
-                              fontSize: 14,
-                            ),
-                          ),
                         ),
                         const SizedBox(height: 12),
                         Align(

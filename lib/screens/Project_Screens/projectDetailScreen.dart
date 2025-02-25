@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/Palette.dart';
 import 'package:taskly/models/Project.dart';
 import 'package:taskly/models/Task.dart';
+import 'package:taskly/models/User.dart';
 import 'package:taskly/provider/auth_cubit.dart';
 import 'package:taskly/provider/project_cubit.dart';
 import 'package:taskly/provider/task_cubit.dart';
@@ -27,7 +28,15 @@ class ProjectDetailScreen extends StatelessWidget {
     }
 
     final project = context.watch<ProjectCubit>().projects!.firstWhere((p) => p.id == projectId);
-    final user = (context.read<AuthCubit>().state as AuthLoggedIn).user;
+    final authState = context.read<AuthCubit>().state;
+    User? user;
+    if (authState is AuthLoggedIn){
+      user = authState.user;
+    } else {
+      return Container(
+        color: Palette.backgroundColor,
+      );
+    }
     final tasksCubit = context.read<TaskCubit>();
     bool isEditable = project.leaderId == null || project.leaderId == user.id;
 

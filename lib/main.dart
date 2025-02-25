@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/models/Task.dart';
 import 'package:taskly/models/User.dart';
@@ -13,16 +14,19 @@ import 'package:taskly/screens/Project_Screens/projectScreen.dart';
 import 'package:taskly/screens/taskDetailScreen.dart';
 
 void main() {
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
-        BlocProvider<ProjectCubit>(create: (_) => ProjectCubit()),
-        BlocProvider<TaskCubit>(create: (_) => TaskCubit()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    runApp(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
+          BlocProvider<ProjectCubit>(create: (_) => ProjectCubit()),
+          BlocProvider<TaskCubit>(create: (_) => TaskCubit()),
+        ],
+        child: const MyApp(),
+      ),
+    );
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -38,10 +42,9 @@ class MyApp extends StatelessWidget {
           title: 'Taskly App',
           home: Stack(
             children: [
-              // Si los datos aún están cargando, mostramos el indicador de carga
               if (snapshot.connectionState == ConnectionState.waiting)
                 Container(
-                  color: Colors.white, // Fondo blanco para que se vea limpio
+                  color: Colors.white,
                   child: const Center(
                     child: CircularProgressIndicator(),
                   ),

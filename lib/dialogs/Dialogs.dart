@@ -388,20 +388,20 @@ class Dialogs {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text('Editar Tarea',
+          title: const Text('Editar Proyecto',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Palette.textColor)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: 'Nombre de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              decoration: const InputDecoration(labelText: 'Nombre del proyecto', labelStyle: TextStyle(color: Colors.white)),
               style: const TextStyle(color: Palette.textColor),
               ),
               const SizedBox(height: 10),
               TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Descripción de la tarea', labelStyle: TextStyle(color: Colors.white)),
+              decoration: const InputDecoration(labelText: 'Descripción del proyecto', labelStyle: TextStyle(color: Colors.white)),
               style: const TextStyle(color: Palette.textColor),
               ),
             ],
